@@ -1,10 +1,10 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { AccessToken } from "livekit-server-sdk";
 import type { AccessTokenOptions, VideoGrant } from "livekit-server-sdk";
 import { TokenResult } from "../../lib/types";
 
-export const runtime = 'edge';
+export const config = {
+  runtime: 'edge',
+};
 
 const apiKey = process.env.LIVEKIT_API_KEY;
 const apiSecret = process.env.LIVEKIT_API_SECRET;
@@ -17,46 +17,28 @@ const createToken = (userInfo: AccessTokenOptions, grant: VideoGrant) => {
 
 const roomPattern = /\w{4}\-\w{4}/;
 
-export default async function handleToken(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handleToken(req: Request) {
   try {
-    const { roomName, identity, name, metadata } = req.query;
+    const { searchParams } = new URL(req.url);
+    const roomName = searchParams.get('roomName');
+    const identity = searchParams.get('identity') || undefined;
+    const name = searchParams.get('name') || undefined;
+    const metadata = searchParams.get('metadata') || undefined;
 
-    if (typeof identity !== "string" || typeof roomName !== "string") {
-      res.statusMessage =
-        "identity and roomName have to be specified in the request";
-      res.status(403).end();
-      return;
+    if (!identity || !roomName) {
+      return new Response('identity and roomName have to be specified in the request', { status: 403 });
     }
 
     if (!apiKey || !apiSecret) {
-      res.statusMessage = "Environment variables aren't set up correctly";
-      res.status(500).end();
-      return;
-    }
-
-    if (Array.isArray(name)) {
-      throw Error("provide max one name");
-    }
-    if (Array.isArray(metadata)) {
-      throw Error("provide max one metadata string");
+      return new Response('Environment variables aren\'t set up correctly', { status: 500 });
     }
 
     // enforce room name to be xxxx-xxxx
     // this is simple & naive way to prevent user from guessing room names
     // please use your own authentication mechanisms in your own app
     if (!roomName.match(roomPattern)) {
-      res.statusMessage = "Invalid roomName";
-      res.status(400).end();
-      return;
+      return new Response('Invalid roomName', { status: 400 });
     }
-
-    // if (!userSession.isAuthenticated) {
-    //   res.status(403).end();
-    //   return;
-    // }
 
     const grant: VideoGrant = {
       room: roomName,
@@ -72,9 +54,8 @@ export default async function handleToken(
       accessToken: token,
     };
 
-    res.status(200).json(result);
+    return new Response(JSON.stringify(result), { status: 200 });
   } catch (e) {
-    res.statusMessage = (e as Error).message;
-    res.status(500).end();
+    return new Response((e as Error).message, { status: 500 });
   }
 }
