@@ -264,22 +264,10 @@ export default function Playground({
             {description}
           </ConfigurationPanelItem>
         )}
-
-        <ConfigurationPanelItem title="Settings">
-          <div className="flex flex-col gap-2">
-            {metadata?.map((data, index) => (
-              <NameValueRow
-                key={data.name + index}
-                name={data.name}
-                value={data.value}
-              />
-            ))}
-          </div>
-        </ConfigurationPanelItem>
         <ConfigurationPanelItem title="Status">
           <div className="flex flex-col gap-2">
             <NameValueRow
-              name="Room connected"
+              name="Quantum tunnel"
               value={
                 roomState === ConnectionState.Connecting ? (
                   <LoadingSVG diameter={16} strokeWidth={2} />
@@ -294,7 +282,7 @@ export default function Playground({
               }
             />
             <NameValueRow
-              name="Agent connected"
+              name="Multiverse Connected"
               value={
                 isAgentConnected ? (
                   "true"
@@ -307,7 +295,7 @@ export default function Playground({
               valueColor={isAgentConnected ? `${themeColor}-500` : "gray-500"}
             />
             <NameValueRow
-              name="Agent status"
+              name="Other-self status"
               value={
                 agentState !== "offline" && agentState !== "speaking" ? (
                   <div className="flex gap-2 items-center">
@@ -344,24 +332,6 @@ export default function Playground({
           >
             <AudioInputTile frequencies={localMultibandVolume} />
           </ConfigurationPanelItem>
-        )}
-        <div className="w-full">
-          <ConfigurationPanelItem title="Color">
-            <ColorPicker
-              colors={themeColors}
-              selectedColor={themeColor}
-              onSelect={(color) => {
-                setThemeColor(color);
-              }}
-            />
-          </ConfigurationPanelItem>
-        </div>
-        {showQR && (
-          <div className="w-full">
-            <ConfigurationPanelItem title="QR Code">
-              <QRCodeSVG value={window.location.href} width="128" />
-            </ConfigurationPanelItem>
-          </div>
         )}
       </div>
     );
