@@ -76,9 +76,9 @@ export default function Home() {
   const token = useToken("/api/token", roomName, tokenOptions);
   const appConfig = useAppConfig();
   const outputs = [
-    appConfig?.outputs.audio && PlaygroundOutputs.Audio,
-    appConfig?.outputs.video && PlaygroundOutputs.Video,
-    appConfig?.outputs.chat && PlaygroundOutputs.Chat,
+    true && PlaygroundOutputs.Audio,
+    true && PlaygroundOutputs.Video,
+    true && PlaygroundOutputs.Chat,
   ].filter((item) => typeof item !== "boolean") as PlaygroundOutputs[];
 
   const handleConnect = useCallback(
@@ -95,13 +95,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>{appConfig?.title ?? "LiveKit Agents Playground"}</title>
+        <title>{'Purfect Me'}</title>
         <meta
           name="description"
-          content={
-            appConfig?.description ??
-            "Quickly prototype and test your multimodal agents"
-          }
+          content={'Quantum multiverse link to your desired reality'}
         />
         <meta
           name="viewport"
@@ -141,8 +138,8 @@ export default function Home() {
             className="flex flex-col h-full w-full"
             serverUrl={liveKitUrl}
             token={customToken ?? token}
-            audio={appConfig?.inputs.mic}
-            video={appConfig?.inputs.camera}
+            audio={true}
+            video={true}
             connect={shouldConnect}
             onError={(e) => {
               setToastMessage({ message: e.message, type: "error" });
@@ -150,16 +147,16 @@ export default function Home() {
             }}
           >
             <Playground
-              title={appConfig?.title}
-              githubLink={appConfig?.github_link}
+              title={'Purfect Me'}
+              githubLink={'https://github.com/distortedmedia'}
               outputs={outputs}
-              showQR={appConfig?.show_qr}
-              description={appConfig?.description}
+              showQR={false}
+              description={'Quantum multiverse link to your desired reality'}
               themeColors={themeColors}
-              defaultColor={appConfig?.theme_color ?? "cyan"}
+              defaultColor={'violet'}
               onConnect={handleConnect}
               metadata={metadata}
-              videoFit={appConfig?.video_fit ?? "cover"}
+              videoFit={'cover'}
             />
             <RoomAudioRenderer />
             <StartAudio label="Click to enable audio playback" />
