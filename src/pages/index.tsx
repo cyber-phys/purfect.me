@@ -111,7 +111,7 @@ export default function Home() {
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta
           property="og:image"
-          content="https://lexaid.ai/purfectme.png"
+          content="https://purfect.me/purfectme.png"
         />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
