@@ -1,14 +1,4 @@
-<!--BEGIN_BANNER_IMAGE-->
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="/.github/banner_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="/.github/banner_light.png">
-  <img style="width:100%;" alt="The LiveKit icon, the name of the repository and some sample code in the background." src="https://raw.githubusercontent.com/livekit/agent-playground/main/.github/banner_light.png">
-</picture>
-
-<!--END_BANNER_IMAGE-->
-
-# LiveKit Agents Playground
+# Purfect.me
 
 <!--BEGIN_DESCRIPTION-->
 The Agent Playground is designed for quickly prototyping with server side agents built with [LiveKit Agents Framework](https://github.com/livekit/agents). Easily tap into LiveKit WebRTC sessions and process or generate audio, video, and data streams.
