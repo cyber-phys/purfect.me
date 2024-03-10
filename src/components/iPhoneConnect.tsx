@@ -1,15 +1,15 @@
 import { Button } from "./button/Button";
 import { useRef } from "react";
 
-type iPhoneConnectProps = {
+type IPhoneConnectProps = {
   accentColor: string;
   onConnectClicked: (url: string, roomToken: string) => void;
 };
 
-export const iPhoneConnect = ({
+export const IPhoneConnect = ({
   accentColor,
   onConnectClicked,
-}: iPhoneConnectProps) => {
+}: IPhoneConnectProps) => {
   const urlInput = useRef<HTMLInputElement>(null);
   const tokenInput = useRef<HTMLTextAreaElement>(null);
 

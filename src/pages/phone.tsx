@@ -10,7 +10,7 @@ import { Inter } from "next/font/google";
 import Head from "next/head";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { iPhoneConnect } from "@/components/iPhoneConnect";
+import { IPhoneConnect } from "@/components/iPhoneConnect";
 import Playground, {
   PlaygroundMeta,
   PlaygroundOutputs,
@@ -162,7 +162,7 @@ export default function Home() {
             <StartAudio label="Click to enable audio playback" />
           </LiveKitRoom>
         ) : (
-          <iPhoneConnect
+          <IPhoneConnect
             accentColor={themeColors[0]}
             onConnectClicked={(url, token) => {
               handleConnect(true, { url, token });
