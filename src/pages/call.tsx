@@ -18,27 +18,23 @@ const IncomingCallScreen: React.FC<IncomingCallProps> = ({
   onMessage,
 }) => {
   return (
-    <div className="h-screen w-full bg-gradient-to-b from-[#160000] to-[#000116] flex flex-col justify-between">
-      <div className="pt-10">
-        <div className="text-center text-white">
-          <h1 className="text-2xl font-semibold">Operator</h1>
-          <p className="text-xl">Quantum Call</p>
+    <div className="h-screen w-full bg-gradient-to-b from-[#160000] to-[#000116] flex flex-col justify-between items-center">
+      <div className="hidden md:block md:w-[375px] md:h-[812px] md:bg-[url('/IPhone_15_Vector.svg')] md:bg-no-repeat md:bg-contain md:flex md:flex-col md:justify-between">
+        <div className="pt-10">
+          <div className="text-center text-white">
+            <h1 className="text-2xl font-semibold">Operator</h1>
+            <p className="text-xl">Quantum Call</p>
+          </div>
         </div>
-      </div>
 
-
-
-      <div className="flex justify-around items-center pb-10">
-        <button
-          onClick={onDecline}
-        >
-          <img src={'/call-decline.svg'} style={{ width: '56px', height: '56px' }}/>
-        </button>
-        <button
-          onClick={onAccept}
-        >
-          <img src={'/call-answer.svg'} style={{ width: '56px', height: '56px' }}/>
-        </button>
+        <div className="flex justify-around items-center pb-10">
+          <button onClick={onDecline}>
+            <img src={'/call-decline.svg'} style={{ width: '56px', height: '56px' }}/>
+          </button>
+          <button onClick={onAccept}>
+            <img src={'/call-answer.svg'} style={{ width: '56px', height: '56px' }}/>
+          </button>
+        </div>
       </div>
     </div>
   );
