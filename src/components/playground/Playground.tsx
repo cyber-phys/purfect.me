@@ -1,5 +1,5 @@
 "use client";
-
+import { DataPacket_Kind } from "livekit-client";
 import { LoadingSVG } from "@/components/button/LoadingSVG";
 import { ChatMessageType, ChatTile } from "@/components/chat/ChatTile";
 import { ColorPicker } from "@/components/colorPicker/ColorPicker";
@@ -58,6 +58,8 @@ export interface PlaygroundProps {
   onConnect: (connect: boolean, opts?: { token: string; url: string }) => void;
   metadata?: PlaygroundMeta[];
   videoFit?: "contain" | "cover";
+  characterPrompt: string;
+  onCharacterPromptChange: (prompt: string) => void;
 }
 
 const headerHeight = 56;
@@ -74,6 +76,8 @@ export default function Playground({
   onConnect,
   metadata,
   videoFit,
+  characterPrompt,
+  onCharacterPromptChange,
 }: PlaygroundProps) {
   const [agentState, setAgentState] = useState<AgentState>("offline");
   const [themeColor, setThemeColor] = useState(defaultColor);
@@ -173,6 +177,13 @@ export default function Playground({
     [transcripts]
   );
 
+  const { send } = useDataChannel(onDataReceived);
+
+  const handleCharacterPromptChange = (prompt: string) => {
+    onCharacterPromptChange(prompt);
+    send(new TextEncoder().encode(JSON.stringify({ topic: "character_prompt", prompt })), {reliable: true});   
+  };
+
   // combine transcripts and chat together
   useEffect(() => {
     const allMessages = [...transcripts];
@@ -199,8 +210,6 @@ export default function Playground({
     allMessages.sort((a, b) => a.timestamp - b.timestamp);
     setMessages(allMessages);
   }, [transcripts, chatMessages, localParticipant, agentParticipant]);
-
-  useDataChannel(onDataReceived);
 
   const videoTileContent = useMemo(() => {
     const videoFitClassName = `object-${videoFit}`;
@@ -333,6 +342,15 @@ export default function Playground({
             <AudioInputTile frequencies={localMultibandVolume} />
           </ConfigurationPanelItem>
         )}
+        <ConfigurationPanelItem title="Character Prompt">
+          <textarea
+            className="w-full p-2 border border-gray-800 rounded bg-black text-violet-500"
+            rows={4}
+            value={characterPrompt}
+            onChange={(e) => handleCharacterPromptChange(e.target.value)}
+            placeholder="Enter the system prompt for the agent"
+          />
+        </ConfigurationPanelItem>
       </div>
     );
   }, [
