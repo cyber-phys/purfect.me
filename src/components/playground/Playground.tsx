@@ -33,7 +33,8 @@ import {
   Track,
 } from "livekit-client";
 import { QRCodeSVG } from "qrcode.react";
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { Button } from "../button/Button";
 
 export enum PlaygroundOutputs {
   Video,
@@ -84,6 +85,7 @@ export default function Playground({
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [transcripts, setTranscripts] = useState<ChatMessageType[]>([]);
   const { localParticipant } = useLocalParticipant();
+  const characterPromptRef = useRef<HTMLTextAreaElement>(null);
 
   const participants = useRemoteParticipants({
     updateOnlyOn: [RoomEvent.ParticipantMetadataChanged],
@@ -179,10 +181,21 @@ export default function Playground({
 
   const { send } = useDataChannel(onDataReceived);
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    handleCharacterPromptChange(characterPromptRef.current?.value || '');
+  };
+
   const handleCharacterPromptChange = (prompt: string) => {
     onCharacterPromptChange(prompt);
     send(new TextEncoder().encode(JSON.stringify({ topic: "character_prompt", prompt })), {reliable: true});   
   };
+
+  useEffect(() => {
+    if (agentParticipant) {
+      send(new TextEncoder().encode(JSON.stringify({ topic: "character_prompt", prompt })), {reliable: true});   
+    }
+  }, [agentParticipant]);
 
   // combine transcripts and chat together
   useEffect(() => {
@@ -343,13 +356,22 @@ export default function Playground({
           </ConfigurationPanelItem>
         )}
         <ConfigurationPanelItem title="Character Prompt">
+        <form onSubmit={handleFormSubmit}>
           <textarea
-            className="w-full p-2 border border-gray-800 rounded bg-black text-violet-500"
+            ref={characterPromptRef}
+            className="w-full h-full p-2 border border-gray-800 rounded bg-black text-violet-500"
             rows={4}
-            value={characterPrompt}
-            onChange={(e) => handleCharacterPromptChange(e.target.value)}
+            defaultValue={characterPrompt}
             placeholder="Enter the system prompt for the agent"
           />
+          <Button
+          accentColor={'violet'}
+          className="w-half my-2"
+          type="submit"
+          > 
+            Update Prompt
+          </Button>
+        </form>
         </ConfigurationPanelItem>
       </div>
     );
