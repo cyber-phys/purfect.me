@@ -181,7 +181,7 @@ export default function Playground({
 
   const { send } = useDataChannel(onDataReceived);
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleCharacterPromptChange(characterPromptRef.current?.value || '');
   };
