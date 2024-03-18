@@ -483,11 +483,15 @@ export default function Playground({
       {/* <div className="flex flex-col h-full"> */}
       <div className="w-full h-full flex justify-center items-center">
         <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
+        {roomState === ConnectionState.Connected ? (
             <PlaygroundTabbedTile
               className="h-full"
               tabs={mobileTabs}
               initialTab={mobileTabs.length - 1}
             />
+        ):(
+          <ConnectScreen/>
+        )}
           </div>
         <div className="hidden lg:flex md:w-[300px] md:h-[650px] lg:w-[375px] lg:h-[812px] bg-[url('/IPhone_15_Vector.svg')] bg-no-repeat bg-contain flex-col justify-between">
           <div className="pt-8 lg:pt-10">
