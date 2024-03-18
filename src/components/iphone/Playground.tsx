@@ -33,7 +33,9 @@ import {
   Track,
 } from "livekit-client";
 import { QRCodeSVG } from "qrcode.react";
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useState, useRef} from "react";
+import { Button } from "../button/Button";
+import { ButtonImg } from "../button/ButtonImg";
 
 import SettingsIcon from '../../icons/settings.svg';
 
@@ -60,8 +62,6 @@ export interface PlaygroundProps {
   onConnect: (connect: boolean, opts?: { token: string; url: string }) => void;
   metadata?: PlaygroundMeta[];
   videoFit?: "contain" | "cover";
-  characterPrompt: string;
-  onCharacterPromptChange: (prompt: string) => void;
 }
 
 const headerHeight = 56;
@@ -80,7 +80,6 @@ export default function Playground({
   onConnect,
   metadata,
   videoFit,
-  
 }: PlaygroundProps) {
   const [agentState, setAgentState] = useState<AgentState>("offline");
   const [themeColor, setThemeColor] = useState(defaultColor);
@@ -91,6 +90,8 @@ export default function Playground({
   const [isVoiceVisible, setIsVoiceVisible] = useState(true);
   const [isChatVisible, setIsChatVisible] = useState(false);
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
+  const roomState = useConnectionState();
+  const tracks = useTracks();
 
   const toggleVideoVisibility = () => {
     setIsVideoVisible(true);
@@ -126,9 +127,6 @@ export default function Playground({
     }
     return "idle";
   }, [agentState]);
-
-  const roomState = useConnectionState();
-  const tracks = useTracks();
 
   const agentAudioTrack = tracks.find(
     (trackRef) =>
@@ -232,6 +230,43 @@ export default function Playground({
   }, [transcripts, chatMessages, localParticipant, agentParticipant]);
 
   useDataChannel(onDataReceived);
+
+  const ConnectScreen = () => {
+    return (
+      <div className="w-full h-full flex justify-center items-center">
+      <div
+          className={`flex flex-col items-center justify-between gap-4 py-4 grow w-full max-h-[625px] selection:bg-${themeColor}-900`}
+          style={{ height: `calc(100% - ${headerHeight}px - 100px` }}
+      >
+        <div>
+          <p className="text-white text-xs p-1">Facetime Call</p>
+          <p className="text-white text-xl">Operator</p>
+        </div>
+        <img src="/wowsocool.svg" style={{ width: '300px', height: '300px' }}/>
+        <div className="flex justify-around w-full">
+          <ButtonImg
+            img="/call-decline.svg"
+            width='45px'
+            height='45px'
+          >
+            <></> 
+          </ButtonImg>
+          <ButtonImg
+            img="/call-answer.svg"
+            width='45px'
+            height='45px'
+            disabled={roomState === ConnectionState.Connecting}
+            onClick={() => {
+              onConnect(roomState === ConnectionState.Disconnected)
+            }}
+          >
+            <></> 
+          </ButtonImg>
+        </div>
+        </div>
+      </div>
+    );
+  };
 
   const videoTileContent = useMemo(() => {
     const videoFitClassName = `object-${videoFit}`;
@@ -447,96 +482,101 @@ export default function Playground({
       />
       {/* <div className="flex flex-col h-full"> */}
       <div className="w-full h-full flex justify-center items-center">
-      <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
-          <PlaygroundTabbedTile
-            className="h-full"
-            tabs={mobileTabs}
-            initialTab={mobileTabs.length - 1}
-          />
-        </div>
-      <div className="hidden lg:flex md:w-[300px] md:h-[650px] lg:w-[375px] lg:h-[812px] bg-[url('/IPhone_15_Vector.svg')] bg-no-repeat bg-contain flex-col justify-between">
-        <div className="pt-8 lg:pt-10">
-          <div className="text-center text-white">
+        <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
+            <PlaygroundTabbedTile
+              className="h-full"
+              tabs={mobileTabs}
+              initialTab={mobileTabs.length - 1}
+            />
           </div>
-        </div>
-      <div
-        className={`flex gap-4 py-4 grow w-full max-h-[625px] selection:bg-${themeColor}-900`}
-        style={{ height: `calc(100% - ${headerHeight}px - 100px` }}
-      >
-        { isVideoVisible && isVoiceVisible && (
-        <div
-          className={`flex-col grow basis-1/2 gap-4 h-full hidden lg:${
-            !outputs?.includes(PlaygroundOutputs.Audio) &&
-            !outputs?.includes(PlaygroundOutputs.Video)
-              ? "hidden"
-              : "flex"
-          }`}
-        >
-          {isVideoVisible && outputs?.includes(PlaygroundOutputs.Video) && (
-            <PlaygroundTile
-              title="Video"
-              className="w-full h-full grow max-w-[330px] max-h-[812px] lg:flex mx-auto"
-              childrenClassName="justify-center"
-            >
-              {videoTileContent}
-            </PlaygroundTile>
-          )}
-          {isVoiceVisible && outputs?.includes(PlaygroundOutputs.Audio) && (
-            <PlaygroundTile
-              title="Audio"
-              className="w-full h-full grow max-w-[330px] lg:flex mx-auto"
-              childrenClassName="justify-center"
-            >
-              {audioTileContent}
-            </PlaygroundTile>
-          )}
-        </div>
-        )}
-
-        {isChatVisible && outputs?.includes(PlaygroundOutputs.Chat) && (
-          <PlaygroundTile
-            title="Chat"
-            className="w-full h-full grow max-w-[330px] lg:flex mx-auto"
-            >
-            {chatTileContent}
-          </PlaygroundTile>
-        )}
-        {isSettingsVisible && (
-          <PlaygroundTile
-            padding={false}
-            backgroundColor="gray-950"
-            className="h-full w-full items-start overflow-y-auto hidden max-w-[330px] lg:flex mx-auto"
-            childrenClassName="h-full grow items-start"
+        <div className="hidden lg:flex md:w-[300px] md:h-[650px] lg:w-[375px] lg:h-[812px] bg-[url('/IPhone_15_Vector.svg')] bg-no-repeat bg-contain flex-col justify-between">
+          <div className="pt-8 lg:pt-10">
+            <div className="text-center text-white">
+            </div>
+          </div>
+          {roomState === ConnectionState.Connected ? (
+        <>
+          <div
+            className={`flex gap-4 py-4 grow w-full max-h-[625px] selection:bg-${themeColor}-900`}
+            style={{ height: `calc(100% - ${headerHeight}px - 100px` }}
           >
-            {settingsTileContent}
-          </PlaygroundTile>
+            { isVideoVisible && isVoiceVisible && (
+            <div
+              className={`flex-col grow basis-1/2 gap-4 h-full hidden lg:${
+                !outputs?.includes(PlaygroundOutputs.Audio) &&
+                !outputs?.includes(PlaygroundOutputs.Video)
+                  ? "hidden"
+                  : "flex"
+              }`}
+            >
+              {isVideoVisible && outputs?.includes(PlaygroundOutputs.Video) && (
+                <PlaygroundTile
+                  title="Video"
+                  className="w-full h-full grow max-w-[330px] max-h-[812px] lg:flex mx-auto"
+                  childrenClassName="justify-center"
+                >
+                  {videoTileContent}
+                </PlaygroundTile>
+              )}
+              {isVoiceVisible && outputs?.includes(PlaygroundOutputs.Audio) && (
+                <PlaygroundTile
+                  title="Audio"
+                  className="w-full h-full grow max-w-[330px] lg:flex mx-auto"
+                  childrenClassName="justify-center"
+                >
+                  {audioTileContent}
+                </PlaygroundTile>
+              )}
+            </div>
+            )}
+            {isChatVisible && outputs?.includes(PlaygroundOutputs.Chat) && (
+              <PlaygroundTile
+                title="Chat"
+                className="w-full h-full grow max-w-[330px] lg:flex mx-auto"
+                >
+                {chatTileContent}
+              </PlaygroundTile>
+            )}
+            {isSettingsVisible && (
+              <PlaygroundTile
+                padding={false}
+                backgroundColor="gray-950"
+                className="h-full w-full items-start overflow-y-auto hidden max-w-[330px] lg:flex mx-auto"
+                childrenClassName="h-full grow items-start"
+              >
+                {settingsTileContent}
+              </PlaygroundTile>
+            )}
+          </div>
+          <div className="flex justify-center gap-4 pb-[75px]">
+            {/* Button to toggle video visibility */}
+            <button
+              onClick={toggleVideoVisibility}
+            >
+              <img src={'/facetime.svg'} style={{ width: '56px', height: '56px' }}/>
+            </button>
+
+            {/* Button to toggle chat visibility */}
+            <button
+              onClick={toggleChatVisibility}
+            >
+              <img src={'/messages.svg'} style={{ width: '56px', height: '56px' }}/>
+            </button>
+
+            {/* Button to toggle settings visibility */}
+            <button
+              onClick={toggleSettingsVisibility}
+              // className={`bg-${themeColor}-500 text-white py-2 px-4 rounded`}
+            >
+              <img src={'/settings.svg'} style={{ width: '56px', height: '56px' }}/>
+              {/* {isSettingsVisible ? 'Hide Settings' : 'Show Settings'} */}
+            </button>
+          </div>
+        </>
+        ):(
+          <ConnectScreen/>
         )}
-      </div>
-      <div className="flex justify-center gap-4 pb-[75px]">
-        {/* Button to toggle video visibility */}
-        <button
-          onClick={toggleVideoVisibility}
-        >
-          <img src={'/facetime.svg'} style={{ width: '56px', height: '56px' }}/>
-        </button>
-
-        {/* Button to toggle chat visibility */}
-        <button
-          onClick={toggleChatVisibility}
-        >
-          <img src={'/messages.svg'} style={{ width: '56px', height: '56px' }}/>
-        </button>
-
-        {/* Button to toggle settings visibility */}
-        <button
-          onClick={toggleSettingsVisibility}
-          // className={`bg-${themeColor}-500 text-white py-2 px-4 rounded`}
-        >
-          <img src={'/settings.svg'} style={{ width: '56px', height: '56px' }}/>
-          {/* {isSettingsVisible ? 'Hide Settings' : 'Show Settings'} */}
-        </button>
         </div>
-      </div>
       </div>
     </>
   );
