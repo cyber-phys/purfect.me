@@ -60,13 +60,13 @@ export interface PlaygroundProps {
   onConnect: (connect: boolean, opts?: { token: string; url: string }) => void;
   metadata?: PlaygroundMeta[];
   videoFit?: "contain" | "cover";
+  characterPrompt: string;
+  onCharacterPromptChange: (prompt: string) => void;
 }
 
 const headerHeight = 56;
 
 const footerHeight = 56;
-
-
 
 export default function Playground({
   logo,
@@ -80,6 +80,7 @@ export default function Playground({
   onConnect,
   metadata,
   videoFit,
+  
 }: PlaygroundProps) {
   const [agentState, setAgentState] = useState<AgentState>("offline");
   const [themeColor, setThemeColor] = useState(defaultColor);
@@ -444,18 +445,24 @@ export default function Playground({
           onConnect(roomState === ConnectionState.Disconnected)
         }
       />
-      <div className="flex flex-col h-full">
-      <div
-        className={`flex gap-4 py-4 grow w-full selection:bg-${themeColor}-900`}
-        style={{ height: `calc(100% - ${headerHeight}px - ${footerHeight}px)` }}
-      >
-        <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
+      {/* <div className="flex flex-col h-full"> */}
+      <div className="w-full h-full flex justify-center items-center">
+      <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
           <PlaygroundTabbedTile
             className="h-full"
             tabs={mobileTabs}
             initialTab={mobileTabs.length - 1}
           />
         </div>
+      <div className="hidden lg:flex md:w-[300px] md:h-[650px] lg:w-[375px] lg:h-[812px] bg-[url('/IPhone_15_Vector.svg')] bg-no-repeat bg-contain flex-col justify-between">
+        <div className="pt-8 lg:pt-10">
+          <div className="text-center text-white">
+          </div>
+        </div>
+      <div
+        className={`flex gap-4 py-4 grow w-full max-h-[625px] selection:bg-${themeColor}-900`}
+        style={{ height: `calc(100% - ${headerHeight}px - 100px` }}
+      >
         { isVideoVisible && isVoiceVisible && (
         <div
           className={`flex-col grow basis-1/2 gap-4 h-full hidden lg:${
@@ -468,7 +475,7 @@ export default function Playground({
           {isVideoVisible && outputs?.includes(PlaygroundOutputs.Video) && (
             <PlaygroundTile
               title="Video"
-              className="w-full h-full grow"
+              className="w-full h-full grow max-w-[330px] max-h-[812px] lg:flex mx-auto"
               childrenClassName="justify-center"
             >
               {videoTileContent}
@@ -477,7 +484,7 @@ export default function Playground({
           {isVoiceVisible && outputs?.includes(PlaygroundOutputs.Audio) && (
             <PlaygroundTile
               title="Audio"
-              className="w-full h-full grow"
+              className="w-full h-full grow max-w-[330px] lg:flex mx-auto"
               childrenClassName="justify-center"
             >
               {audioTileContent}
@@ -489,8 +496,8 @@ export default function Playground({
         {isChatVisible && outputs?.includes(PlaygroundOutputs.Chat) && (
           <PlaygroundTile
             title="Chat"
-            className="h-full grow basis-1/4 hidden lg:flex"
-          >
+            className="w-full h-full grow max-w-[330px] lg:flex mx-auto"
+            >
             {chatTileContent}
           </PlaygroundTile>
         )}
@@ -498,14 +505,14 @@ export default function Playground({
           <PlaygroundTile
             padding={false}
             backgroundColor="gray-950"
-            className="h-full w-full items-start overflow-y-auto hidden max-w-[480px] lg:flex mx-auto"
+            className="h-full w-full items-start overflow-y-auto hidden max-w-[330px] lg:flex mx-auto"
             childrenClassName="h-full grow items-start"
           >
             {settingsTileContent}
           </PlaygroundTile>
         )}
       </div>
-      <div className="flex justify-center gap-4 py-4">
+      <div className="flex justify-center gap-4 pb-[75px]">
         {/* Button to toggle video visibility */}
         <button
           onClick={toggleVideoVisibility}
@@ -528,6 +535,7 @@ export default function Playground({
           <img src={'/settings.svg'} style={{ width: '56px', height: '56px' }}/>
           {/* {isSettingsVisible ? 'Hide Settings' : 'Show Settings'} */}
         </button>
+        </div>
       </div>
       </div>
     </>
