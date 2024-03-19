@@ -35,6 +35,7 @@ export const IPhoneConnect = ({
             placeholder="room token..."
           ></textarea>
         </div>
+        <img></img>
         <Button
           accentColor={accentColor}
           className="w-full"

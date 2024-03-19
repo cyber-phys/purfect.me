@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
+const {nextui} = require("@nextui-org/react");
+
 const colors = require('tailwindcss/colors')
 const shades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
 const colorList = ['gray', 'green', 'cyan', 'amber', 'violet', 'blue', 'rose', 'pink', 'teal', "red"];
@@ -55,6 +57,7 @@ console.log("Safe list", safelist);
 module.exports = {
   content: [
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     colors: {
@@ -74,6 +77,7 @@ module.exports = {
       }
     }
   },
-  plugins: [],
+  darkMode: "class",
+  plugins: [nextui()],
   safelist,
 };
