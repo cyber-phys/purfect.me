@@ -37,7 +37,17 @@ import { ReactNode, useCallback, useEffect, useMemo, useState, useRef} from "rea
 import { Button } from "../button/Button";
 import { ButtonImg } from "../button/ButtonImg";
 
-import SettingsIcon from '../../icons/settings.svg';
+interface Character {
+  name: string;
+  prompt: string;
+  startingMessages: string[];
+  voice: string;
+  baseModel: string;
+  isVideoTranscriptionEnabled: boolean;
+  isVideoTranscriptionContinuous: boolean;
+  videoTranscriptionModel: string;
+  videoTranscriptionInterval: string;
+}
 
 export enum PlaygroundOutputs {
   Video,
@@ -62,6 +72,7 @@ export interface PlaygroundProps {
   onConnect: (connect: boolean, opts?: { token: string; url: string }) => void;
   metadata?: PlaygroundMeta[];
   videoFit?: "contain" | "cover";
+  characterCard?: Character | null;
 }
 
 const headerHeight = 56;
@@ -80,6 +91,7 @@ export default function Playground({
   onConnect,
   metadata,
   videoFit,
+  characterCard
 }: PlaygroundProps) {
   const [agentState, setAgentState] = useState<AgentState>("offline");
   const [themeColor, setThemeColor] = useState(defaultColor);
@@ -202,6 +214,18 @@ export default function Playground({
     [transcripts]
   );
 
+  const { send } = useDataChannel(onDataReceived);
+
+  useEffect(() => {
+    if (agentParticipant && characterCard) {
+      const characterCardData = JSON.stringify({ 
+        topic: "character_card", 
+        character: characterCard 
+      });
+      send(new TextEncoder().encode(characterCardData), { reliable: true });
+    }
+  }, [agentParticipant]);
+
   // combine transcripts and chat together
   useEffect(() => {
     const allMessages = [...transcripts];
@@ -228,8 +252,6 @@ export default function Playground({
     allMessages.sort((a, b) => a.timestamp - b.timestamp);
     setMessages(allMessages);
   }, [transcripts, chatMessages, localParticipant, agentParticipant]);
-
-  useDataChannel(onDataReceived);
 
   const ConnectScreen = () => {
     return (
