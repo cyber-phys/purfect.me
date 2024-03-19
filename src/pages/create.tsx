@@ -54,6 +54,11 @@ const multimodalModels = [
     { name: "OpenAI: GPT-4 Vision", id: "openai/gpt-4-vision-preview" }
 ];
 
+const voices = [
+    // { name: "Rick", id: "voices/rick.wav" },
+    { name: "Golden Voice", id: "/voices/goldvoice.wav" }
+];
+
 export default function App() {
     const [models, setModels] = useState<ModelData[]>([]);
     const [selectedModel, setSelectedModel] = useState<string | undefined>(undefined);
@@ -65,6 +70,7 @@ export default function App() {
     const [isVideoTranscriptionContinuous, setIsVideoTranscriptionContinuous] = useState(false);
     const [selectedVideoTranscriptionModel, setSelectedVideoTranscriptionModel] = useState<string | undefined>(undefined);
     const [selectedVideoTranscriptionInterval, setSelectedVideoTranscriptionInterval] = useState<string>("60");
+    const [selectedVoice, setSelectedVoice] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         const fetchModels = async () => {
@@ -265,6 +271,18 @@ export default function App() {
                     </div>
                     <ChatBubbles />
                     <Select
+                        label="Voice"
+                        placeholder="Choose a voice"
+                        value={selectedVoice}
+                        onChange={(e) => setSelectedVoice(e.target.value)}
+                        className="w-full"
+                    >
+                        {voices.map((voice) => (
+                            <SelectItem key={voice.id} value={voice.id}>
+                                {voice.name}
+                            </SelectItem>
+                        ))}
+                    </Select>                    <Select
                         label="Base Model"
                         placeholder="Choose a model"
                         value={selectedModel}
@@ -293,7 +311,7 @@ export default function App() {
                         </Switch>
                         {isBaseModelMultiModal && (
                             <p className="text-small text-default-500 text-center">Base model is multimodal</p>
-                        )}                    
+                        )}
                     </div>
                     {isVideoTranscriptionEnabled && (
                         <div>
