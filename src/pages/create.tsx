@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Textarea, Select, SelectItem } from "@nextui-org/react";
+import { Textarea, Select, SelectItem, Avatar } from "@nextui-org/react";
+import { CameraIcon } from "@/components/CameraIcon";
 
 type ModelData = {
   id: string;
@@ -42,6 +43,7 @@ type ModelsJSON = {
 export default function App() {
     const [models, setModels] = useState<ModelData[]>([]);
     const [selectedModel, setSelectedModel] = useState<string | undefined>(undefined);
+    const [avatarImage, setAvatarImage] = useState<File | null>(null);
   
     useEffect(() => {
       const fetchModels = async () => {
@@ -77,15 +79,46 @@ export default function App() {
         return null;
       };
     
+      const handleAvatarClick = () => {
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = "image/*";
+        fileInput.onchange = (event) => {
+          const file = (event.target as HTMLInputElement).files?.[0];
+          if (file) {
+            setAvatarImage(file);
+          }
+        };
+        fileInput.click();
+      };
+    
       return (
         <div className="flex justify-center items-center h-screen dark text-foreground bg-background">
           <div className="flex-col border border-violet-400 p-4 rounded">
             <h1 className="text-violet-200">Create a new character</h1>
+            <div className="py-2">
+                <div className="flex items-center justify-center space-x-4">
+                  <Avatar
+                    showFallback
+                    src={avatarImage ? URL.createObjectURL(avatarImage) : undefined}
+                    fallback={
+                      <CameraIcon
+                        className="animate-pulse w-6 h-6 text-default-500 cursor-pointer"
+                        fill="currentColor"
+                        size={20}
+                        onClick={handleAvatarClick}
+                      />
+                    }
+                    onClick={handleAvatarClick}
+                    style={{ cursor: "pointer" }}
+                  />
+                </div>
+              </div>
             <form onSubmit={handleSubmit} className="w-full max-w-xs">
               <Textarea
                 isRequired
                 label="Name"
-                placeholder="Enter characters name"
+                placeholder="Enter character's name"
                 variant="bordered"
                 className="w-full py-2"
               />
@@ -96,15 +129,6 @@ export default function App() {
                 variant="bordered"
                 className="w-full py-2"
               />
-              <div className="py-2">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                  Upload a photo
-                </label>
-                <input
-                  type="file"
-                  className="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-                />
-              </div>
               <Select
                 label="Select a model"
                 placeholder="Choose a model"
