@@ -95,11 +95,13 @@ export default function App() {
     const getSelectedModelDetails = () => {
         const model = models.find((model) => model.id === selectedModel);
         if (model) {
+            const outputTokensPrice = parseFloat(model.pricing.completion) * 1000000;
+            const InputTokensPrice = parseFloat(model.pricing.prompt) * 1000000;
             return (
                 <div className="mt-2">
                     <p>Context: {model.context_length}</p>
-                    <p>Input Tokens: ${model.pricing.prompt} / 1M</p>
-                    <p>Output Tokens: ${model.pricing.completion} / 1M</p>
+                    <p>Input Tokens: ${InputTokensPrice.toLocaleString()} / 1M</p>
+                    <p>Output Tokens: ${outputTokensPrice.toLocaleString()} / 1M</p>
                 </div>
             );
         }
@@ -109,11 +111,19 @@ export default function App() {
     const getVideoModelDetails = () => {
         const model = models.find((model) => model.id === selectedVideoTranscriptionModel);
         if (model) {
+            const interval = parseInt(selectedVideoTranscriptionInterval, 10);
+            const pricePerMinute = 255 * 60 / interval * parseFloat(model.pricing.image);
+            const outputTokensPrice = parseFloat(model.pricing.completion) * 1000000;
+            const InputTokensPrice = parseFloat(model.pricing.prompt) * 1000000;
+            const ImageTokensPrice = parseFloat(model.pricing.image) * 1000;
             return (
                 <div className="mt-2">
                     <p>Context: {model.context_length}</p>
-                    <p>Input Tokens: ${model.pricing.prompt} / 1M</p>
-                    <p>Output Tokens: ${model.pricing.completion} / 1M</p>
+                    <p>Input Image Tokens: ${ImageTokensPrice.toLocaleString()} / 1K</p>
+                    <p>Output Tokens: ${outputTokensPrice.toLocaleString()} / 1M</p>
+                    {isVideoTranscriptionContinuous && (
+                        <p>  Per Minute: ${pricePerMinute.toFixed(2)}</p>
+                    )}
                 </div>
             );
         }
