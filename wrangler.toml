@@ -1,0 +1,11 @@
+name = "agents-playground"
+
+compatibility_flags = ["nodejs_compat"]
+
+[[kv_namespaces]]
+binding = "CHARACTERS_KV"
+id = "fc3792d034ec4018bb9aee0768f60411"
+
+[[r2_buckets]]
+binding = 'AVATARS_R2'
+bucket_name = 'avatars-dev'
