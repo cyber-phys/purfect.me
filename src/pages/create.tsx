@@ -218,9 +218,10 @@ export default function App() {
     };
 
     return (
-        <div className="flex justify-center items-center h-screen dark text-foreground bg-background">
-            <div className="flex-col border border-violet-400 p-4 rounded">
-                <h1 className="text-violet-200">Create a new character</h1>
+        <div className="flex justify-center items-center h-screen dark text-foreground bg-background p-2">
+        <div className="flex-col border border-violet-400 p-4 rounded w-full max-w-[400px] h-full overflow-hidden">
+            <h1 className="text-violet-200">Create a new character</h1>
+            <ScrollShadow hideScrollBar className="w-full h-full overflow-auto flex flex-col items-center">
                 <div className="py-2">
                     <div className="flex items-center justify-center space-x-4">
                         <Avatar
@@ -239,7 +240,7 @@ export default function App() {
                         />
                     </div>
                 </div>
-                <form onSubmit={handleSubmit} className="w-full max-w-xs">
+                <form onSubmit={handleSubmit} className="w-full max-w-xs mb-10">
                     <Textarea
                         isRequired
                         label="Name"
@@ -254,6 +255,7 @@ export default function App() {
                         variant="bordered"
                         className="w-full py-2"
                     />
+                    <div className={`${startingMessages.length > 0 ? 'border border-gray-600 rounded p-2 my-2' : ''} py-2`}>
                     <div className="flex items-center space-x-2 py-2">
                         <Textarea
                             label="Starting Messages"
@@ -261,7 +263,7 @@ export default function App() {
                             value={currentMessage}
                             onChange={handleMessageChange}
                             variant="bordered"
-                            className="w-full"
+                            className="w-full"y
                         />
                         <Button
                             onClick={handleAddMessage}
@@ -270,6 +272,7 @@ export default function App() {
                         </Button>
                     </div>
                     <ChatBubbles />
+                    </div>
                     <Select
                         label="Voice"
                         placeholder="Choose a voice"
@@ -282,7 +285,8 @@ export default function App() {
                                 {voice.name}
                             </SelectItem>
                         ))}
-                    </Select>                    <Select
+                    </Select>                    
+                    <Select
                         label="Base Model"
                         placeholder="Choose a model"
                         value={selectedModel}
@@ -362,6 +366,7 @@ export default function App() {
                         Submit
                     </button>
                 </form>
+                </ScrollShadow>
             </div>
         </div>
     );
