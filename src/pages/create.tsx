@@ -289,6 +289,7 @@ export default function App() {
                     <Textarea
                         isRequired
                         label="Name"
+                        name="name"
                         placeholder="Enter character's name"
                         variant="bordered"
                         className="w-full py-2"
@@ -296,6 +297,7 @@ export default function App() {
                     <Textarea
                         isRequired
                         label="Prompt"
+                        name="prompt"
                         placeholder="Enter character prompt"
                         variant="bordered"
                         className="w-full py-2"

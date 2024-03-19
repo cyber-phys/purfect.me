@@ -4,6 +4,13 @@ import { useEffect, useState } from 'react';
 interface Character {
   name: string;
   prompt: string;
+  startingMessages: string[];
+  voice: string;
+  baseModel: string;
+  isVideoTranscriptionEnabled: boolean;
+  isVideoTranscriptionContinuous: boolean;
+  videoTranscriptionModel: string;
+  videoTranscriptionInterval: string;
 }
 
 export default function Page() {
@@ -21,6 +28,7 @@ export default function Page() {
           if (response.ok) {
             const data: Character = await response.json();
             setCharacter(data);
+            console.log(data);
           } else {
             setError('Failed to fetch character');
           }
@@ -48,8 +56,20 @@ export default function Page() {
 
   return (
     <div className="dark text-foreground bg-background">
-      <h1 className="text-2xl text-violet-500">{character.name}</h1>
+      <p>{character.name}</p>
       <p>{character.prompt}</p>
+      <p>Voice: {character.voice}</p>
+      <p>Base Model: {character.baseModel}</p>
+      <p>Video Transcription Enabled: {character.isVideoTranscriptionEnabled ? 'Yes' : 'No'}</p>
+      <p>Video Transcription Continuous: {character.isVideoTranscriptionContinuous ? 'Yes' : 'No'}</p>
+      <p>Video Transcription Model: {character.videoTranscriptionModel}</p>
+      <p>Video Transcription Interval: {character.videoTranscriptionInterval}</p>
+      <h2 className="text-xl text-violet-500">Starting Messages:</h2>
+      <ul>
+        {character.startingMessages.map((message, index) => (
+          <li key={index}>{message}</li>
+        ))}
+      </ul>
     </div>
   );
 }
