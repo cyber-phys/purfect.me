@@ -92,10 +92,9 @@ export default function App() {
         }
     }, [isVideoTranscriptionEnabled]);
 
-    const handleSubmit = (event) => {
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         // Handle form submission logic here
-        console.log("Form submitted");
     };
 
     const getSelectedModelDetails = () => {
@@ -263,7 +262,7 @@ export default function App() {
                             value={currentMessage}
                             onChange={handleMessageChange}
                             variant="bordered"
-                            className="w-full"y
+                            className="w-full"
                         />
                         <Button
                             onClick={handleAddMessage}

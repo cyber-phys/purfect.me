@@ -86,6 +86,8 @@ export default function Playground({
   const [transcripts, setTranscripts] = useState<ChatMessageType[]>([]);
   const { localParticipant } = useLocalParticipant();
   const characterPromptRef = useRef<HTMLTextAreaElement>(null);
+  const roomState = useConnectionState();
+  const tracks = useTracks();
 
   const participants = useRemoteParticipants({
     updateOnlyOn: [RoomEvent.ParticipantMetadataChanged],
@@ -101,9 +103,6 @@ export default function Playground({
     }
     return "idle";
   }, [agentState]);
-
-  const roomState = useConnectionState();
-  const tracks = useTracks();
 
   const agentAudioTrack = tracks.find(
     (trackRef) =>
@@ -223,7 +222,7 @@ export default function Playground({
     allMessages.sort((a, b) => a.timestamp - b.timestamp);
     setMessages(allMessages);
   }, [transcripts, chatMessages, localParticipant, agentParticipant]);
-
+  
   const videoTileContent = useMemo(() => {
     const videoFitClassName = `object-${videoFit}`;
     return (
