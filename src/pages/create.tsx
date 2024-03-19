@@ -42,6 +42,10 @@ type ModelsJSON = {
     data: ModelData[];
 };
 
+interface CharacterResponse {
+    characterId: string;
+}
+
 const multimodalModels = [
     { name: "Anthropic: Claude 3 Haiku", id: "anthropic/claude-3-haiku" },
     { name: "Anthropic: Claude 3 Haiku (self-moderated)", id: "anthropic/claude-3-haiku:beta" },
@@ -120,7 +124,7 @@ export default function App() {
             });
     
             if (response.ok) {
-                const data = await response.json();
+                const data: CharacterResponse = await response.json();
                 const characterId = data.characterId;
                 console.log("Character ID:", characterId);
                 router.push(`/talk/${characterId}`);
