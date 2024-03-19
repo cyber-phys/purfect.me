@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Textarea, Select, SelectItem, Avatar, Button, ScrollShadow, Switch } from "@nextui-org/react";
 import { CameraIcon } from "@/components/CameraIcon";
 import { PlusIcon } from "@/components/PlusIcon";
+import { useRouter } from 'next/router';
 
 type ModelData = {
     id: string;
@@ -60,6 +61,7 @@ const voices = [
 ];
 
 export default function App() {
+    const router = useRouter();
     const [models, setModels] = useState<ModelData[]>([]);
     const [selectedModel, setSelectedModel] = useState<string | undefined>(undefined);
     const [avatarImage, setAvatarImage] = useState<File | null>(null);
@@ -91,11 +93,51 @@ export default function App() {
             setIsVideoTranscriptionContinuous(false);
         }
     }, [isVideoTranscriptionEnabled]);
-
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // Handle form submission logic here
+    
+        const payload = {
+            name: (event.currentTarget.elements.namedItem("name") as HTMLInputElement | HTMLTextAreaElement)?.value,
+            prompt: (event.currentTarget.elements.namedItem("prompt") as HTMLInputElement | HTMLTextAreaElement)?.value,
+            startingMessages: startingMessages,
+            voice: selectedVoice || "",
+            baseModel: selectedModel || "",
+            isVideoTranscriptionEnabled: isVideoTranscriptionEnabled,
+            isVideoTranscriptionContinuous: isVideoTranscriptionContinuous,
+            videoTranscriptionModel: selectedVideoTranscriptionModel || "",
+            videoTranscriptionInterval: selectedVideoTranscriptionInterval,
+            avatarImage: avatarImage ? await toBase64(avatarImage) : null
+        };
+    
+        try {
+            const response = await fetch("/api/new-character", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload),
+            });
+    
+            if (response.ok) {
+                const data = await response.json();
+                const characterId = data.characterId;
+                console.log("Character ID:", characterId);
+                router.push(`/talk/${characterId}`);
+            } else {
+                console.error("Error creating character:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error creating character:", error);
+        }
     };
+    
+    const toBase64 = (file: File) => new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = error => reject(error);
+    });
 
     const getSelectedModelDetails = () => {
         const model = models.find((model) => model.id === selectedModel);
