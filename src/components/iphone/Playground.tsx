@@ -504,7 +504,7 @@ export default function Playground({
       />
       {/* <div className="flex flex-col h-full"> */}
       <div className="w-full h-full flex justify-center items-center">
-        <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
+        <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden pb-4">
         {roomState === ConnectionState.Connected ? (
             <PlaygroundTabbedTile
               className="h-full"
