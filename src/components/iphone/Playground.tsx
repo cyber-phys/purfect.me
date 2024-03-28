@@ -230,8 +230,8 @@ export default function Playground({
   useEffect(() => {
     const allMessages = [...transcripts];
     for (const msg of chatMessages) {
-      const isAgent = msg.from?.identity === agentParticipant?.identity;
-      const isSelf = msg.from?.identity === localParticipant?.identity;
+      const isAgent = msg.is_assistant === true;
+      const isSelf = msg.is_assistant === false;
       let name = msg.from?.name;
       if (!name) {
         if (isAgent) {

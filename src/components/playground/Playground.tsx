@@ -17,7 +17,6 @@ import { useMultibandTrackVolume } from "@/hooks/useTrackVolume";
 import { AgentState } from "@/lib/types";
 import {
   VideoTrack,
-  useChat,
   useConnectionState,
   useDataChannel,
   useLocalParticipant,
@@ -35,6 +34,8 @@ import {
 import { QRCodeSVG } from "qrcode.react";
 import { ReactNode, useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Button } from "../button/Button";
+import { useChat } from "@/components/chat/useChat";
+
 
 export enum PlaygroundOutputs {
   Video,
