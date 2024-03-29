@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Inter } from "next/font/google";
 import Head from "next/head";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from 'next/router';
 
 import { IPhoneConnect } from "@/components/iPhoneConnect";
 import Playground, {
@@ -17,6 +18,18 @@ import Playground, {
 } from "@/components/iphone/Playground";
 import { PlaygroundToast, ToastType } from "@/components/toast/PlaygroundToast";
 import { useAppConfig } from "@/hooks/useAppConfig";
+
+interface Character {
+  name: string;
+  prompt: string;
+  startingMessages: string[];
+  voice: string;
+  baseModel: string;
+  isVideoTranscriptionEnabled: boolean;
+  isVideoTranscriptionContinuous: boolean;
+  videoTranscriptionModel: string;
+  videoTranscriptionInterval: string;
+}
 
 const themeColors = [
   "cyan",
@@ -31,7 +44,40 @@ const themeColors = [
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+export default function Page() {
+  const router = useRouter();
+  const { slug } = router.query;
+  const [character, setCharacter] = useState<Character | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCharacter = async () => {
+      const characterId = process.env.NEXT_PUBLIC_DEFAULT_CHARACTER_ID;
+      console.log(characterId)
+      console.log(process.env.NEXT_PUBLIC_LIVEKIT_URL)
+      if (characterId) {
+        try {
+          const response = await fetch(`/api/get-character?id=${characterId}`);
+          if (response.ok) {
+            const data: Character = await response.json();
+            setCharacter(data);
+            console.log(data);
+          } else {
+            setError('Failed to fetch character');
+          }
+        } catch (error) {
+          setError('An error occurred while fetching the character');
+        }
+      } else {
+        setError('No default character ID provided');
+      }
+      setLoading(false);
+    };
+  
+    fetchCharacter();
+  }, []);
+
   const [toastMessage, setToastMessage] = useState<{
     message: string;
     type: ToastType;
@@ -157,6 +203,7 @@ export default function Home() {
               onConnect={handleConnect}
               metadata={metadata}
               videoFit={'cover'}
+              characterCard={character}
             />
             <RoomAudioRenderer />
             <StartAudio label="Click to enable audio playback" />

@@ -53,23 +53,41 @@ export default function Page() {
 
   useEffect(() => {
     const fetchCharacter = async () => {
-      if (slug) {
-        try {
-          const response = await fetch(`/api/get-character?id=${slug}`);
-          if (response.ok) {
-            const data: Character = await response.json();
-            setCharacter(data);
-            console.log(data);
-          } else {
-            setError('Failed to fetch character');
+      let characterId = slug;
+  
+      if (!characterId) {
+        characterId = process.env.NEXT_PUBLIC_DEFAULT_CHARACTER_ID;
+      }
+  
+      try {
+        const response = await fetch(`/api/get-character?id=${characterId}`);
+        if (response.ok) {
+          const data: Character = await response.json();
+          setCharacter(data);
+          console.log(data);
+        } else {
+          setError('Failed to fetch character');
+          if (!slug) {
+            // If the slug wasn't provided, we already used the default character ID
+            setLoading(false);
+            return;
           }
-        } catch (error) {
-          setError('An error occurred while fetching the character');
+          // Try fetching with the default character ID if the slug was provided but failed
+          const defaultResponse = await fetch(`/api/get-character?id=${process.env.NEXT_PUBLIC_DEFAULT_CHARACTER_ID}`);
+          if (defaultResponse.ok) {
+            const defaultData: Character = await defaultResponse.json();
+            setCharacter(defaultData);
+            console.log(defaultData);
+          } else {
+            setError('Failed to fetch default character');
+          }
         }
+      } catch (error) {
+        setError('An error occurred while fetching the character');
       }
       setLoading(false);
     };
-
+  
     fetchCharacter();
   }, [slug]);
 
