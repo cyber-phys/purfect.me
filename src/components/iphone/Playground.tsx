@@ -79,6 +79,80 @@ const headerHeight = 56;
 
 const footerHeight = 56;
 
+
+const htmlString = `
+<!-- Using html, css, and three.js create an interactive peice of digital art for the prompt:
+"I am in love with you" -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>I am in love with you</title>
+  <style>
+    body { margin: 0; }
+    canvas { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // Set up the scene, camera, and renderer
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Create a heart-shaped geometry
+    const heartShape = new THREE.Shape();
+    heartShape.moveTo(0, 0);
+    heartShape.bezierCurveTo(0, -3, -5, -5, -10, -5);
+    heartShape.bezierCurveTo(-15, -5, -20, 0, -20, 5);
+    heartShape.bezierCurveTo(-20, 10, -10, 15, 0, 15);
+    heartShape.bezierCurveTo(10, 15, 20, 10, 20, 5);
+    heartShape.bezierCurveTo(20, 0, 15, -5, 10, -5);
+    heartShape.bezierCurveTo(5, -5, 0, -3, 0, 0);
+
+    const geometry = new THREE.ShapeGeometry(heartShape);
+    const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const heartMesh = new THREE.Mesh(geometry, material);
+    scene.add(heartMesh);
+
+    // Create a particle system
+    const particleCount = 1000;
+    const particles = new THREE.BufferGeometry();
+    const particlePositions = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+      const i3 = i * 3;
+      particlePositions[i3] = Math.random() * 40 - 20;
+      particlePositions[i3 + 1] = Math.random() * 40 - 20;
+      particlePositions[i3 + 2] = Math.random() * 40 - 20;
+    }
+
+    particles.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+    const particleMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.2, sizeAttenuation: true });
+    const particleSystem = new THREE.Points(particles, particleMaterial);
+    scene.add(particleSystem);
+
+    camera.position.z = 30;
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+
+      heartMesh.rotation.y += 0.01;
+      particleSystem.rotation.x += 0.005;
+      particleSystem.rotation.y += 0.01;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
+`;
+
 export default function Playground({
   logo,
   title,
@@ -102,8 +176,13 @@ export default function Playground({
   const [isVoiceVisible, setIsVoiceVisible] = useState(true);
   const [isChatVisible, setIsChatVisible] = useState(false);
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
+  const [iframeContent, setIframeContent] = useState("");
   const roomState = useConnectionState();
   const tracks = useTracks();
+
+  useEffect(() => {
+    setIframeContent(htmlString);
+  }, []);
 
   const toggleVideoVisibility = () => {
     setIsVideoVisible(true);
@@ -295,7 +374,7 @@ export default function Playground({
   const videoTileContent = useMemo(() => {
     const videoFitClassName = `object-${videoFit}`;
     return (
-      <div className="flex flex-col w-full grow text-gray-950 bg-black rounded-sm border border-gray-800 relative">
+      <div className="flex flex-col w-full grow text-gray-950 rounded-sm border border-gray-800 relative">
         {agentVideoTrack ? (
           <VideoTrack
             trackRef={agentVideoTrack}
@@ -504,8 +583,17 @@ export default function Playground({
           onConnect(roomState === ConnectionState.Disconnected)
         }
       />
+    <div className="fixed top-0 left-0 w-full h-full z-[1]">
+      <iframe
+        srcDoc={iframeContent}
+        title="Background"
+        sandbox="allow-scripts"
+        frameBorder="0"
+        className="w-full h-full"
+      />
+    </div>
       {/* <div className="flex flex-col h-full"> */}
-      <div className="w-full h-full flex justify-center items-center">
+      <div className="w-full h-full flex justify-center items-center z-[2]">
         <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden pb-4">
         {roomState === ConnectionState.Connected ? (
             <PlaygroundTabbedTile
