@@ -12,6 +12,7 @@ export interface ChatMessage {
   timestamp: number;
   message: string;
   is_assistant: boolean;
+  highlight_word_count: number;
 }
 
 /** @public */
@@ -110,7 +111,7 @@ export function setupChat(room: Room, options?: ChatOptions) {
   const send = async (message: string) => {
     const timestamp = Date.now();
     const id = crypto.randomUUID();
-    const chatMessage: ChatMessage = { id, message, timestamp, is_assistant: false};
+    const chatMessage: ChatMessage = { id, message, timestamp, is_assistant: false, highlight_word_count: 0};
     const encodedMsg = finalMessageEncoder(chatMessage);
     isSending$.next(true);
     try {
@@ -131,7 +132,7 @@ export function setupChat(room: Room, options?: ChatOptions) {
 
   const update = async (message: string, messageId: string) => {
     const timestamp = Date.now();
-    const chatMessage: ChatMessage = { id: messageId, message, timestamp, is_assistant: false};
+    const chatMessage: ChatMessage = { id: messageId, message, timestamp, is_assistant: false, highlight_word_count: 0};
     const encodedMsg = finalMessageEncoder(chatMessage);
     isSending$.next(true);
     try {

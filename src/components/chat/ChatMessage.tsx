@@ -3,6 +3,7 @@ type ChatMessageProps = {
   accentColor: string;
   name: string;
   isSelf: boolean;
+  highlight_word_count: number;
 };
 
 export const ChatMessage = ({
@@ -10,7 +11,36 @@ export const ChatMessage = ({
   message,
   accentColor,
   isSelf,
+  highlight_word_count,
 }: ChatMessageProps) => {
+  const words = message.split(/(\s+)/);
+  let highlightedWords = 0;
+
+  const coloredMessage = words.map((word, index) => {
+    if (word.trim() === '') {
+      return <span key={index}>{word}</span>;
+    }
+
+    highlightedWords++;
+
+    if (isSelf) {
+      return <span key={index} className="text-gray-300">{word}</span>;
+    } else {
+      return (
+        <span
+          key={index}
+          className={`${
+            highlightedWords <= highlight_word_count
+              ? `text-${accentColor}-500`
+              : `text-${accentColor}-800`
+          }`}
+        >
+          {word}
+        </span>
+      );
+    }
+  });
+
   return (
     <div className="flex flex-col gap-1">
       <div
@@ -21,11 +51,9 @@ export const ChatMessage = ({
         {name}
       </div>
       <div
-        className={`pr-4 text-${
-          isSelf ? "gray-300" : accentColor + "-500"
-        } text-sm ${isSelf ? "" : "drop-shadow-" + accentColor}`}
+        className={`pr-4 text-sm ${isSelf ? "" : "drop-shadow-" + accentColor}`}
       >
-        {message}
+        {coloredMessage}
       </div>
     </div>
   );

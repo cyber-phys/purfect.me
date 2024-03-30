@@ -172,6 +172,7 @@ export default function Playground({
             message: decoded.text,
             timestamp: timestamp,
             isSelf: true,
+            highlight_word_count: 0,
           },
         ]);
       }
@@ -201,8 +202,8 @@ export default function Playground({
   useEffect(() => {
     const allMessages = [...transcripts];
     for (const msg of chatMessages) {
-      const isAgent = msg.from?.identity === agentParticipant?.identity;
-      const isSelf = msg.from?.identity === localParticipant?.identity;
+      const isAgent = msg.is_assistant === true;
+      const isSelf = msg.is_assistant === false;
       let name = msg.from?.name;
       if (!name) {
         if (isAgent) {
@@ -218,11 +219,13 @@ export default function Playground({
         message: msg.message,
         timestamp: msg?.timestamp,
         isSelf: isSelf,
+        highlight_word_count: msg.highlight_word_count,
       });
     }
     allMessages.sort((a, b) => a.timestamp - b.timestamp);
     setMessages(allMessages);
   }, [transcripts, chatMessages, localParticipant, agentParticipant]);
+
   
   const videoTileContent = useMemo(() => {
     const videoFitClassName = `object-${videoFit}`;

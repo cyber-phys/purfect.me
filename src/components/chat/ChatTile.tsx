@@ -10,6 +10,7 @@ export type ChatMessageType = {
   message: string;
   isSelf: boolean;
   timestamp: number;
+  highlight_word_count: number;
 };
 
 type ChatTileProps = {
@@ -43,6 +44,7 @@ export const ChatTile = ({ messages, accentColor, onSend }: ChatTileProps) => {
               message={message.message}
               isSelf={message.isSelf}
               accentColor={accentColor}
+              highlight_word_count={message.highlight_word_count}
             />
           ))}
         </div>

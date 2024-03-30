@@ -207,6 +207,7 @@ export default function Playground({
             message: decoded.text,
             timestamp: timestamp,
             isSelf: true,
+            highlight_word_count: 0,
           },
         ]);
       }
@@ -247,6 +248,7 @@ export default function Playground({
         message: msg.message,
         timestamp: msg?.timestamp,
         isSelf: isSelf,
+        highlight_word_count: msg.highlight_word_count,
       });
     }
     allMessages.sort((a, b) => a.timestamp - b.timestamp);
