@@ -24,7 +24,7 @@ export const PlaygroundHeader = ({
 }: PlaygroundHeader) => {
   return (
     <div
-      className={`flex gap-4 pt-4 text-${accentColor}-500 justify-between items-center shrink-0`}
+      className={`flex gap-4 pt-4 text-${accentColor}-500 justify-between items-center shrink-0 z-[99]`}
       style={{
         height: height + "px",
       }}
