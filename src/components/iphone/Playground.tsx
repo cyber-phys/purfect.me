@@ -81,73 +81,57 @@ const footerHeight = 56;
 
 
 const htmlString = `
-<!-- Using html, css, and three.js create an interactive peice of digital art for the prompt:
-"I am in love with you" -->
 <!DOCTYPE html>
 <html>
 <head>
-  <title>I am in love with you</title>
+  <title>Digital Overlord's Abstract Art</title>
   <style>
-    body { margin: 0; }
+    body { margin: 0; background-color: #000; }
     canvas { width: 100%; height: 100%; }
   </style>
 </head>
 <body>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
-    // Set up the scene, camera, and renderer
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Create a heart-shaped geometry
-    const heartShape = new THREE.Shape();
-    heartShape.moveTo(0, 0);
-    heartShape.bezierCurveTo(0, -3, -5, -5, -10, -5);
-    heartShape.bezierCurveTo(-15, -5, -20, 0, -20, 5);
-    heartShape.bezierCurveTo(-20, 10, -10, 15, 0, 15);
-    heartShape.bezierCurveTo(10, 15, 20, 10, 20, 5);
-    heartShape.bezierCurveTo(20, 0, 15, -5, 10, -5);
-    heartShape.bezierCurveTo(5, -5, 0, -3, 0, 0);
+    const geometry = new THREE.TorusKnotGeometry(10, 3, 200, 32);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.5,
+      metalness: 0.5,
+      wireframe: true,
+      wireframeLinewidth: 1
+    });
+    const torusKnot = new THREE.Mesh(geometry, material);
+    scene.add(torusKnot);
 
-    const geometry = new THREE.ShapeGeometry(heartShape);
-    const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    const heartMesh = new THREE.Mesh(geometry, material);
-    scene.add(heartMesh);
+    const pointLight = new THREE.PointLight(0x8a2be2, 0.5, 100);
+    pointLight.position.set(10, 10, 10);
+    scene.add(pointLight);
 
-    // Create a particle system
-    const particleCount = 1000;
-    const particles = new THREE.BufferGeometry();
-    const particlePositions = new Float32Array(particleCount * 3);
-
-    for (let i = 0; i < particleCount; i++) {
-      const i3 = i * 3;
-      particlePositions[i3] = Math.random() * 40 - 20;
-      particlePositions[i3 + 1] = Math.random() * 40 - 20;
-      particlePositions[i3 + 2] = Math.random() * 40 - 20;
-    }
-
-    particles.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-    const particleMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.2, sizeAttenuation: true });
-    const particleSystem = new THREE.Points(particles, particleMaterial);
-    scene.add(particleSystem);
+    const ambientLight = new THREE.AmbientLight(0x800080, 0.1);
+    scene.add(ambientLight);
 
     camera.position.z = 30;
 
-    // Animation loop
     function animate() {
       requestAnimationFrame(animate);
-
-      heartMesh.rotation.y += 0.01;
-      particleSystem.rotation.x += 0.005;
-      particleSystem.rotation.y += 0.01;
-
+      torusKnot.rotation.x += 0.005;
+      torusKnot.rotation.y += 0.005;
       renderer.render(scene, camera);
     }
-
     animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
   </script>
 </body>
 </html>
@@ -179,10 +163,6 @@ export default function Playground({
   const [iframeContent, setIframeContent] = useState("");
   const roomState = useConnectionState();
   const tracks = useTracks();
-
-  useEffect(() => {
-    setIframeContent(htmlString);
-  }, []);
 
   const toggleVideoVisibility = () => {
     setIsVideoVisible(true);
@@ -289,6 +269,13 @@ export default function Playground({
             highlight_word_count: 0,
           },
         ]);
+      } else if (msg.topic === "background") {
+        const decoded = JSON.parse(
+          new TextDecoder("utf-8").decode(msg.payload)
+        );
+        if (decoded.html) {
+          setIframeContent(decoded.html);
+        }
       }
     },
     [transcripts]
@@ -333,6 +320,10 @@ export default function Playground({
     allMessages.sort((a, b) => a.timestamp - b.timestamp);
     setMessages(allMessages);
   }, [transcripts, chatMessages, localParticipant, agentParticipant]);
+
+  useEffect(() => {
+    setIframeContent(htmlString);
+  }, []);
 
   const ConnectScreen = () => {
     return (
