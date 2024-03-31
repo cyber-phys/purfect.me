@@ -253,12 +253,12 @@ export default function Playground({
 
   const handleCharacterPromptChange = (prompt: string) => {
     onCharacterPromptChange(prompt);
-    send(new TextEncoder().encode(JSON.stringify({ topic: "character_prompt", prompt })), {reliable: true});   
+    send(new TextEncoder().encode(JSON.stringify({ topic: "character_prompt", prompt })), { reliable: true });
   };
 
   useEffect(() => {
     if (agentParticipant) {
-      send(new TextEncoder().encode(JSON.stringify({ topic: "character_prompt", prompt })), {reliable: true});   
+      send(new TextEncoder().encode(JSON.stringify({ topic: "character_prompt", prompt })), { reliable: true });
     }
   }, [agentParticipant]);
 
@@ -290,7 +290,7 @@ export default function Playground({
     setMessages(allMessages);
   }, [transcripts, chatMessages, localParticipant, agentParticipant]);
 
-  
+
   const videoTileContent = useMemo(() => {
     const videoFitClassName = `object-${videoFit}`;
     return (
@@ -423,22 +423,22 @@ export default function Playground({
           </ConfigurationPanelItem>
         )}
         <ConfigurationPanelItem title="Character Prompt">
-        <form onSubmit={handleFormSubmit}>
-          <textarea
-            ref={characterPromptRef}
-            className="w-full h-full p-2 border border-gray-800 rounded bg-black text-violet-500"
-            rows={4}
-            defaultValue={characterPrompt}
-            placeholder="Enter the system prompt for the agent"
-          />
-          <Button
-          accentColor={'violet'}
-          className="w-half my-2"
-          type="submit"
-          > 
-            Update Prompt
-          </Button>
-        </form>
+          <form onSubmit={handleFormSubmit}>
+            <textarea
+              ref={characterPromptRef}
+              className="w-full h-full p-2 border border-gray-800 rounded bg-black text-violet-500"
+              rows={4}
+              defaultValue={characterPrompt}
+              placeholder="Enter the system prompt for the agent"
+            />
+            <Button
+              accentColor={'violet'}
+              className="w-half my-2"
+              type="submit"
+            >
+              Update Prompt
+            </Button>
+          </form>
         </ConfigurationPanelItem>
       </div>
     );
@@ -532,7 +532,8 @@ export default function Playground({
       >
         {canvasTileContent}
       </PlaygroundTile>
-    ),  });
+    ),
+  });
 
   return (
     <>
@@ -558,15 +559,24 @@ export default function Playground({
             initialTab={mobileTabs.length - 1}
           />
         </div>
-        <div
-          className={`flex-col grow basis-1/2 gap-4 h-full hidden lg:${
-            !outputs?.includes(PlaygroundOutputs.Audio) &&
-            !outputs?.includes(PlaygroundOutputs.Video)
-              ? "hidden"
-              : "flex"
-          }`}
-        >
-          {outputs?.includes(PlaygroundOutputs.Video) && (
+        {outputs?.includes(PlaygroundOutputs.Chat) && (
+          <PlaygroundTile
+            title="Chat"
+            className="h-full grow basis-3/4 hidden lg:flex"
+          >
+            {chatTileContent}
+          </PlaygroundTile>
+        )}
+        <div className="flex-col grow basis-1/4 gap-4 h-full hidden lg:flex">
+          <PlaygroundTile
+            padding={false}
+            backgroundColor="gray-950"
+            className="w-full h-1/2 grow"
+            childrenClassName="justify-center"
+          >
+            {settingsTileContent}
+          </PlaygroundTile>
+          {/* {outputs?.includes(PlaygroundOutputs.Video) && (
             <PlaygroundTile
               title="Video"
               className="w-full h-full grow"
@@ -574,34 +584,18 @@ export default function Playground({
             >
               {videoTileContent}
             </PlaygroundTile>
-          )}
+          )} */}
           {outputs?.includes(PlaygroundOutputs.Audio) && (
             <PlaygroundTile
               title="Audio"
-              className="w-full h-full grow"
+              className="w-full h-1/2 grow"
               childrenClassName="justify-center"
             >
               {audioTileContent}
             </PlaygroundTile>
           )}
-        </div>
 
-        {outputs?.includes(PlaygroundOutputs.Chat) && (
-          <PlaygroundTile
-            title="Chat"
-            className="h-full grow basis-1/4 hidden lg:flex"
-          >
-            {chatTileContent}
-          </PlaygroundTile>
-        )}
-        <PlaygroundTile
-          padding={false}
-          backgroundColor="gray-950"
-          className="h-full w-full basis-1/4 items-start overflow-y-auto hidden max-w-[480px] lg:flex"
-          childrenClassName="h-full grow items-start"
-        >
-          {settingsTileContent}
-        </PlaygroundTile>
+        </div>
       </div>
     </>
   );
