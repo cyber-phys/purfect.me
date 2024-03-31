@@ -36,7 +36,6 @@ import { ReactNode, useCallback, useEffect, useMemo, useState, useRef } from "re
 import { Button } from "../button/Button";
 import { useChat } from "@/components/chat/useChat";
 
-
 export enum PlaygroundOutputs {
   Video,
   Audio,
@@ -66,6 +65,63 @@ export interface PlaygroundProps {
 
 const headerHeight = 56;
 
+const htmlString = `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Digital Overlord's Abstract Art</title>
+  <style>
+    body { margin: 0; background-color: #000; }
+    canvas { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const geometry = new THREE.TorusKnotGeometry(10, 3, 200, 32);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.5,
+      metalness: 0.5,
+      wireframe: true,
+      wireframeLinewidth: 1
+    });
+    const torusKnot = new THREE.Mesh(geometry, material);
+    scene.add(torusKnot);
+
+    const pointLight = new THREE.PointLight(0x8a2be2, 0.5, 100);
+    pointLight.position.set(10, 10, 10);
+    scene.add(pointLight);
+
+    const ambientLight = new THREE.AmbientLight(0x800080, 0.1);
+    scene.add(ambientLight);
+
+    camera.position.z = 30;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      torusKnot.rotation.x += 0.005;
+      torusKnot.rotation.y += 0.005;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
+`;
+
 export default function Playground({
   logo,
   title,
@@ -87,6 +143,7 @@ export default function Playground({
   const [transcripts, setTranscripts] = useState<ChatMessageType[]>([]);
   const { localParticipant } = useLocalParticipant();
   const characterPromptRef = useRef<HTMLTextAreaElement>(null);
+  const [iframeContent, setIframeContent] = useState(htmlString);
   const roomState = useConnectionState();
   const tracks = useTracks();
 
@@ -175,6 +232,13 @@ export default function Playground({
             highlight_word_count: 0,
           },
         ]);
+      } else if (msg.topic === "background") {
+        const decoded = JSON.parse(
+          new TextDecoder("utf-8").decode(msg.payload)
+        );
+        if (decoded.html) {
+          setIframeContent(decoded.html);
+        }
       }
     },
     [transcripts]
@@ -230,7 +294,7 @@ export default function Playground({
   const videoTileContent = useMemo(() => {
     const videoFitClassName = `object-${videoFit}`;
     return (
-      <div className="flex flex-col w-full grow text-gray-950 bg-black rounded-sm border border-gray-800 relative">
+      <div className="flex flex-col w-full grow text-gray-950 rounded-sm border border-gray-800 relative">
         {agentVideoTrack ? (
           <VideoTrack
             trackRef={agentVideoTrack}
@@ -392,6 +456,23 @@ export default function Playground({
     showQR,
   ]);
 
+  const canvasTileContent = useMemo(() => {
+    return (
+      <iframe
+        srcDoc={iframeContent}
+        title="Background"
+        sandbox="allow-scripts"
+        frameBorder="0"
+        className="w-full h-full bg-black hide-scrollbar"
+        style={{
+          overflow: 'hidden',
+          scrollbarWidth: 'none', // For Firefox
+          msOverflowStyle: 'none', // For Internet Explorer and Edge
+        }}
+      />
+    );
+  }, [themeColor, iframeContent]);
+
   let mobileTabs: PlaygroundTab[] = [];
   if (outputs?.includes(PlaygroundOutputs.Video)) {
     mobileTabs.push({
@@ -441,6 +522,17 @@ export default function Playground({
       </PlaygroundTile>
     ),
   });
+
+  mobileTabs.push({
+    title: "Canvas",
+    content: (
+      <PlaygroundTile
+        className="w-full h-full overflow-y-auto flex"
+        childrenClassName="h-full grow items-start"
+      >
+        {canvasTileContent}
+      </PlaygroundTile>
+    ),  });
 
   return (
     <>
