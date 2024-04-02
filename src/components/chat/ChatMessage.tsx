@@ -42,18 +42,28 @@ export const ChatMessage = ({
   });
 
   return (
-    <div className="flex flex-col gap-1">
-      <div
-        className={`text-${
-          isSelf ? "gray-700" : accentColor + "-800 text-ts-" + accentColor
-        } uppercase text-xs`}
-      >
-        {name}
-      </div>
-      <div
-        className={`pr-4 text-sm ${isSelf ? "" : "drop-shadow-" + accentColor}`}
-      >
-        {coloredMessage}
+    <div className="flex flex-col">
+      <div className="relative">
+        <div
+          className={`border ${
+            isSelf ? "border-gray-300" : "border-" + accentColor + "-500"
+          } p-2 rounded`}
+        >
+          <div
+            className={`absolute left-2 top-0 px-2 transform -translate-y-1/2 bg-black text-${
+              isSelf ? "gray-700" : accentColor + "-800 text-ts-" + accentColor
+            } uppercase text-xs`}
+          >
+            {name}
+          </div>
+          <div
+            className={`text-sm ${
+              isSelf ? "" : "drop-shadow-" + accentColor
+            } mt-2`}
+          >
+            {coloredMessage}
+          </div>
+        </div>
       </div>
     </div>
   );
