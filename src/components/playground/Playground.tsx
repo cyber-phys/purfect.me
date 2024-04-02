@@ -64,6 +64,8 @@ export interface PlaygroundProps {
 }
 
 const headerHeight = 56;
+const displayAudioTile = false;
+const displayVideoTile = false;
 
 const htmlString = `
 <!DOCTYPE html>
@@ -474,7 +476,7 @@ export default function Playground({
   }, [themeColor, iframeContent]);
 
   let mobileTabs: PlaygroundTab[] = [];
-  if (outputs?.includes(PlaygroundOutputs.Video)) {
+  if (outputs?.includes(PlaygroundOutputs.Video) && displayVideoTile) {
     mobileTabs.push({
       title: "Video",
       content: (
@@ -488,7 +490,7 @@ export default function Playground({
     });
   }
 
-  if (outputs?.includes(PlaygroundOutputs.Audio)) {
+  if (outputs?.includes(PlaygroundOutputs.Audio) && displayAudioTile) {
     mobileTabs.push({
       title: "Audio",
       content: (
@@ -532,6 +534,27 @@ export default function Playground({
       >
         {canvasTileContent}
       </PlaygroundTile>
+    ),
+  });
+
+  mobileTabs.push({
+    title: "Game",
+    content: (
+      <div className="flex flex-col h-full">
+        <PlaygroundTile
+          className="w-full h-1/2 overflow-y-auto flex"
+          childrenClassName="h-full grow items-start"
+        >
+          {canvasTileContent}
+        </PlaygroundTile>
+        
+        <PlaygroundTile
+          title="Chat"
+          className="h-1/2 grow flex"
+        >
+          {chatTileContent}
+        </PlaygroundTile>
+      </div>
     ),
   });
 
@@ -585,7 +608,7 @@ export default function Playground({
               {videoTileContent}
             </PlaygroundTile>
           )} */}
-          {outputs?.includes(PlaygroundOutputs.Audio) && (
+          {/* {outputs?.includes(PlaygroundOutputs.Audio) && (
             <PlaygroundTile
               title="Audio"
               className="w-full h-1/2 grow"
@@ -593,8 +616,14 @@ export default function Playground({
             >
               {audioTileContent}
             </PlaygroundTile>
-          )}
-
+          )} */}
+          <PlaygroundTile
+            title="Canvas"
+            className="w-full h-full overflow-y-auto flex"
+            childrenClassName="h-full grow items-start"
+          >
+            {canvasTileContent}
+          </PlaygroundTile>
         </div>
       </div>
     </>
