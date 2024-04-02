@@ -15,7 +15,7 @@ import { IPhoneConnect } from "@/components/iPhoneConnect";
 import Playground, {
   PlaygroundMeta,
   PlaygroundOutputs,
-} from "@/components/iphone/Playground";
+} from "@/components/playground/Playground";
 import { PlaygroundToast, ToastType } from "@/components/toast/PlaygroundToast";
 import { useAppConfig } from "@/hooks/useAppConfig";
 
@@ -155,7 +155,7 @@ export default function Page() {
         <meta property="og:image:height" content="630" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="relative flex flex-col justify-center px-4 items-center h-full w-full bg-black repeating-square-background">
+      <div className="relative flex flex-col justify-center px-4 items-center h-full w-full bg-black">
         <AnimatePresence>
           {toastMessage && (
             <motion.div

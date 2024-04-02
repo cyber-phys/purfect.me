@@ -36,6 +36,18 @@ import { ReactNode, useCallback, useEffect, useMemo, useState, useRef } from "re
 import { Button } from "../button/Button";
 import { useChat } from "@/components/chat/useChat";
 
+interface Character {
+  name: string;
+  prompt: string;
+  startingMessages: string[];
+  voice: string;
+  baseModel: string;
+  isVideoTranscriptionEnabled: boolean;
+  isVideoTranscriptionContinuous: boolean;
+  videoTranscriptionModel: string;
+  videoTranscriptionInterval: string;
+}
+
 export enum PlaygroundOutputs {
   Video,
   Audio,
@@ -59,8 +71,7 @@ export interface PlaygroundProps {
   onConnect: (connect: boolean, opts?: { token: string; url: string }) => void;
   metadata?: PlaygroundMeta[];
   videoFit?: "contain" | "cover";
-  characterPrompt: string;
-  onCharacterPromptChange: (prompt: string) => void;
+  characterCard?: Character | null;
 }
 
 const headerHeight = 56;
@@ -136,13 +147,11 @@ export default function Playground({
   onConnect,
   metadata,
   videoFit,
-  characterPrompt,
-  onCharacterPromptChange,
+  characterCard,
 }: PlaygroundProps) {
   const [agentState, setAgentState] = useState<AgentState>("offline");
   const [themeColor, setThemeColor] = useState(defaultColor);
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
-  const [transcripts, setTranscripts] = useState<ChatMessageType[]>([]);
   const { localParticipant } = useLocalParticipant();
   const characterPromptRef = useRef<HTMLTextAreaElement>(null);
   const [iframeContent, setIframeContent] = useState(htmlString);
@@ -216,25 +225,7 @@ export default function Playground({
 
   const onDataReceived = useCallback(
     (msg: any) => {
-      if (msg.topic === "transcription") {
-        const decoded = JSON.parse(
-          new TextDecoder("utf-8").decode(msg.payload)
-        );
-        let timestamp = new Date().getTime();
-        if ("timestamp" in decoded && decoded.timestamp > 0) {
-          timestamp = decoded.timestamp;
-        }
-        setTranscripts([
-          ...transcripts,
-          {
-            name: "You",
-            message: decoded.text,
-            timestamp: timestamp,
-            isSelf: true,
-            highlight_word_count: 0,
-          },
-        ]);
-      } else if (msg.topic === "background") {
+      if (msg.topic === "background") {
         const decoded = JSON.parse(
           new TextDecoder("utf-8").decode(msg.payload)
         );
@@ -243,7 +234,7 @@ export default function Playground({
         }
       }
     },
-    [transcripts]
+    []
   );
 
   const { send } = useDataChannel(onDataReceived);
@@ -254,7 +245,6 @@ export default function Playground({
   };
 
   const handleCharacterPromptChange = (prompt: string) => {
-    onCharacterPromptChange(prompt);
     send(new TextEncoder().encode(JSON.stringify({ topic: "character_prompt", prompt })), { reliable: true });
   };
 
@@ -264,9 +254,19 @@ export default function Playground({
     }
   }, [agentParticipant]);
 
+  useEffect(() => {
+    if (agentParticipant && characterCard) {
+      const characterCardData = JSON.stringify({ 
+        topic: "character_card", 
+        character: characterCard 
+      });
+      send(new TextEncoder().encode(characterCardData), { reliable: true });
+    }
+  }, [agentParticipant]);
+
   // combine transcripts and chat together
   useEffect(() => {
-    const allMessages = [...transcripts];
+    const allMessages = [];
     for (const msg of chatMessages) {
       const isAgent = msg.is_assistant === true;
       const isSelf = msg.is_assistant === false;
@@ -288,9 +288,8 @@ export default function Playground({
         highlight_word_count: msg.highlight_word_count,
       });
     }
-    allMessages.sort((a, b) => a.timestamp - b.timestamp);
     setMessages(allMessages);
-  }, [transcripts, chatMessages, localParticipant, agentParticipant]);
+  }, [chatMessages, localParticipant, agentParticipant]);
 
 
   const videoTileContent = useMemo(() => {
@@ -430,7 +429,7 @@ export default function Playground({
               ref={characterPromptRef}
               className="w-full h-full p-2 border border-gray-800 rounded bg-black text-violet-500"
               rows={4}
-              defaultValue={characterPrompt}
+              defaultValue={characterCard?.prompt}
               placeholder="Enter the system prompt for the agent"
             />
             <Button
