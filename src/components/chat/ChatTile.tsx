@@ -17,9 +17,36 @@ type ChatTileProps = {
   messages: ChatMessageType[];
   accentColor: string;
   onSend?: (message: string) => Promise<ComponentsChatMessage>;
+  onCommand?: (command: string, arg?: number) => void;
 };
 
-export const ChatTile = ({ messages, accentColor, onSend }: ChatTileProps) => {
+export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileProps) => {
+  const handleCommand = (command: string) => {
+    const [cmd, arg] = command.slice(1).split(/\[(\d+)\]/);
+    const numArg = arg ? parseInt(arg, 10) : undefined;
+  
+    switch (cmd) {
+      case "help":
+        // Handle !help command
+        console.log("Handling !help command");
+        break;
+      case "fw":
+        // Handle !fw[n] command
+        console.log(`Handling !fw command with argument: ${numArg}`);
+        break;
+      case "rgen":
+        // Handle !rgen command
+        console.log("Handling !rgen command");
+        break;
+      case "alt":
+        // Handle !alt[n] command
+        console.log(`Handling !alt command with argument: ${numArg}`);
+        break;
+      default:
+        console.log(`Unknown command: ${command}`);
+    }
+  };
+
   const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (containerRef.current) {
@@ -54,6 +81,7 @@ export const ChatTile = ({ messages, accentColor, onSend }: ChatTileProps) => {
         placeholder="Type a message"
         accentColor={accentColor}
         onSend={onSend}
+        onCommand={handleCommand}
       />
     </div>
   );

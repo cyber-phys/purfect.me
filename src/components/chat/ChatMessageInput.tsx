@@ -6,6 +6,7 @@ type ChatMessageInput = {
   accentColor: string;
   height: number;
   onSend?: (message: string) => void;
+  onCommand?: (command: string) => void;
 };
 
 export const ChatMessageInput = ({
@@ -13,6 +14,7 @@ export const ChatMessageInput = ({
   accentColor,
   height,
   onSend,
+  onCommand,
 }: ChatMessageInput) => {
   const [message, setMessage] = useState("");
   const [inputTextWidth, setInputTextWidth] = useState(0);
@@ -30,10 +32,16 @@ export const ChatMessageInput = ({
     if (message === "") {
       return;
     }
-
-    onSend(message);
+  
+    if (message.startsWith("!")) {
+      if (onCommand) {
+        onCommand(message);
+      }
+    } else {
+      onSend(message);
+    }
     setMessage("");
-  }, [onSend, message]);
+  }, [onSend, onCommand, message]);
 
   useEffect(() => {
     setIsTyping(true);
