@@ -636,7 +636,7 @@ export default function Playground({
             </PlaygroundTile>
           )} */}
           <PlaygroundTile
-j            className="w-full h-full overflow-y-auto flex"
+            className="w-full h-full overflow-y-auto flex"
             childrenClassName="h-full grow items-start"
           >
             {canvasTileContent}
