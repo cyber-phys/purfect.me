@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import Head from "next/head";
 import { useState } from "react";
+import { useRouter } from 'next/router';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,37 +14,50 @@ interface Character {
 
 const characters: Character[] = [
   {
-    id: "1",
-    name: "Character 1",
+    id: "5a277c5d-a660-4b77-8dc2-4f7c2d7bdaf6",
+    name: "Purfect Operator",
     image: "/character1.png",
-    description: "Description of Character 1",
+    description: "Your purfect feline friend",
   },
   {
     id: "2",
-    name: "Character 2",
+    name: "World Sim",
     image: "/character2.png",
-    description: "Description of Character 2",
+    description: "Claud world sim",
   },
   // Add more characters...
 ];
 
-const RetroCard = ({ character }: { character: Character }) => (
-  <div className="retro-card">
-    <img src={character.image} alt={character.name} className="retro-card-image" />
-    <div className="retro-card-content">
-      <h3 className="retro-card-title">{character.name}</h3>
-      <p className="retro-card-description">{character.description}</p>
-      <button className="retro-card-button">Chat Now</button>
+const RetroCard = ({ character }: { character: Character }) => {
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    router.push(`/talk/${character.id}`);
+  };
+
+  return (
+    <div className="retro-card" onClick={handleCardClick}>
+      <img src={character.image} alt={character.name} className="retro-card-image" />
+      <div className="retro-card-content">
+        <h3 className="retro-card-title">{character.name}</h3>
+        <p className="retro-card-description">{character.description}</p>
+        <button className="retro-card-button">Chat Now</button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   const filteredCharacters = characters.filter((character) =>
     character.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleCreateNewCharacter = () => {
+    router.push('/create');
+  };
 
   return (
     <>
@@ -209,7 +223,15 @@ export default function Page() {
           <h1 className="retro-title">Purfect Me</h1>
         </header>
         <main className="retro-main">
-          <h2 className="retro-subtitle">Explore Characters</h2>
+          <div className="retro-main-header">
+            <h2 className="retro-subtitle">Explore Characters</h2>
+            <button
+              onClick={handleCreateNewCharacter}
+              className="retro-button retro-button-create"
+            >
+              Create New Character
+            </button>
+          </div>
           <input
             type="text"
             placeholder="Search characters..."

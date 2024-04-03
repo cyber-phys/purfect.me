@@ -160,3 +160,21 @@ body {
   font-size: 14px;
   margin: 0;
 }
+
+.retro-main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.retro-button-create {
+  background-color: #4b0082;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 16px;
+  cursor: pointer;
+}
