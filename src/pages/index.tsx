@@ -1,150 +1,49 @@
-import { generateRandomAlphanumeric } from "@/lib/util";
-import {
-  LiveKitRoom,
-  RoomAudioRenderer,
-  StartAudio,
-  useToken,
-} from "@livekit/components-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { Inter } from "next/font/google";
 import Head from "next/head";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from 'next/router';
-
-import { IPhoneConnect } from "@/components/iPhoneConnect";
-import Playground, {
-  PlaygroundMeta,
-  PlaygroundOutputs,
-} from "@/components/iphone/Playground";
-import { PlaygroundToast, ToastType } from "@/components/toast/PlaygroundToast";
-import { useAppConfig } from "@/hooks/useAppConfig";
-
-interface Character {
-  name: string;
-  prompt: string;
-  startingMessages: string[];
-  voice: string;
-  baseModel: string;
-  isVideoTranscriptionEnabled: boolean;
-  isVideoTranscriptionContinuous: boolean;
-  videoTranscriptionModel: string;
-  videoTranscriptionInterval: string;
-}
-
-const themeColors = [
-  "cyan",
-  "green",
-  "amber",
-  "blue",
-  "violet",
-  "rose",
-  "pink",
-  "teal",
-];
+import { useState } from "react";
+import { Card, CardHeader, CardBody, CardFooter, Image, Button } from "@nextui-org/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
+interface Character {
+  id: string;
+  name: string;
+  image: string;
+  description: string;
+}
+
+const characters: Character[] = [
+  {
+    id: "1",
+    name: "Character 1",
+    image: "/character1.png",
+    description: "Description of Character 1",
+  },
+  {
+    id: "2",
+    name: "Character 2",
+    image: "/character2.png",
+    description: "Description of Character 2",
+  },
+  // Add more characters...
+];
+
 export default function Page() {
-  const router = useRouter();
-  const { slug } = router.query;
-  const [character, setCharacter] = useState<Character | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    const fetchCharacter = async () => {
-      const characterId = process.env.NEXT_PUBLIC_DEFAULT_CHARACTER_ID;
-      console.log(characterId)
-      console.log(process.env.NEXT_PUBLIC_LIVEKIT_URL)
-      if (characterId) {
-        try {
-          const response = await fetch(`/api/get-character?id=${characterId}`);
-          if (response.ok) {
-            const data: Character = await response.json();
-            setCharacter(data);
-            console.log(data);
-          } else {
-            setError('Failed to fetch character');
-          }
-        } catch (error) {
-          setError('An error occurred while fetching the character');
-        }
-      } else {
-        setError('No default character ID provided');
-      }
-      setLoading(false);
-    };
-  
-    fetchCharacter();
-  }, []);
-
-  const [toastMessage, setToastMessage] = useState<{
-    message: string;
-    type: ToastType;
-  } | null>(null);
-  const [shouldConnect, setShouldConnect] = useState(false);
-  const [liveKitUrl, setLiveKitUrl] = useState(
-    process.env.NEXT_PUBLIC_LIVEKIT_URL
-  );
-  const [customToken, setCustomToken] = useState<string>();
-  const [metadata, setMetadata] = useState<PlaygroundMeta[]>([]);
-
-  const [roomName, setRoomName] = useState(createRoomName());
-
-  const tokenOptions = useMemo(() => {
-    return {
-      userInfo: { identity: generateRandomAlphanumeric(16) },
-    };
-  }, []);
-
-  // set a new room name each time the user disconnects so that a new token gets fetched behind the scenes for a different room
-  useEffect(() => {
-    if (shouldConnect === false) {
-      setRoomName(createRoomName());
-    }
-  }, [shouldConnect]);
-
-  useEffect(() => {
-    const md: PlaygroundMeta[] = [];
-    if (liveKitUrl && liveKitUrl !== process.env.NEXT_PUBLIC_LIVEKIT_URL) {
-      md.push({ name: "LiveKit URL", value: liveKitUrl });
-    }
-    if (!customToken && tokenOptions.userInfo?.identity) {
-      md.push({ name: "Room Name", value: roomName });
-      md.push({
-        name: "Participant Identity",
-        value: tokenOptions.userInfo.identity,
-      });
-    }
-    setMetadata(md);
-  }, [liveKitUrl, roomName, tokenOptions, customToken]);
-
-  const token = useToken("/api/token", roomName, tokenOptions);
-  const appConfig = useAppConfig();
-  const outputs = [
-    true && PlaygroundOutputs.Audio,
-    true && PlaygroundOutputs.Video,
-    true && PlaygroundOutputs.Chat,
-  ].filter((item) => typeof item !== "boolean") as PlaygroundOutputs[];
-
-  const handleConnect = useCallback(
-    (connect: boolean, opts?: { url: string; token: string }) => {
-      if (connect && opts) {
-        setLiveKitUrl(opts.url);
-        setCustomToken(opts.token);
-      }
-      setShouldConnect(connect);
-    },
-    []
+  const filteredCharacters = characters.filter((character) =>
+    character.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <>
+        <div className="flex flex-col min-h-screen bg-black">
+
       <Head>
-        <title>{'Purfect Me'}</title>
+        <title>Purfect Me</title>
         <meta
           name="description"
-          content={'Quantum multiverse link to your desired reality'}
+          content="Quantum multiverse link to your desired reality"
         />
         <meta
           name="viewport"
@@ -160,6 +59,7 @@ export default function Page() {
         <meta property="og:image:height" content="630" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+<<<<<<< HEAD
       <div className="relative flex flex-col justify-center px-4 items-center h-full w-full bg-black repeating-square-background">
         <AnimatePresence>
           {toastMessage && (
@@ -216,13 +116,63 @@ export default function Page() {
             }}
           />
         )}
+=======
+      <header className="bg-violet-500 text-white py-4">
+        <div className="container mx-auto px-4">
+          <h1 className="text-2xl font-bold">Purfect Me</h1>
+        </div>
+      </header>
+      <main className="container mx-auto px-4 py-8 flex-grow text-white">
+        <h2 className="text-3xl font-bold mb-4">Explore Characters</h2>
+        <input
+          type="text"
+          placeholder="Search characters..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filteredCharacters.map((character) => (
+            <Card key={character.id} isFooterBlurred className="w-full h-[300px]">
+              <CardHeader className="absolute z-10 top-1 flex-col items-start">
+                <h4 className="text-black font-medium text-2xl">{character.name}</h4>
+              </CardHeader>
+              <Image
+                removeWrapper
+                alt={character.name}
+                className="z-0 w-full h-full scale-125 -translate-y-6 object-cover"
+                src={character.image}
+              />
+              <CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between">
+                <div>
+                  <p className="text-black text-tiny">{character.description}</p>
+                </div>
+                <Button className="text-tiny" color="primary" radius="full" size="sm">
+                  Chat Now
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">About Purfect Me</h2>
+          <p>
+            Purfect Me is a chatbot role-playing site that allows you to engage
+            in immersive conversations with a variety of characters. Explore
+            different personalities and embark on exciting adventures in a
+            quantum multiverse.
+          </p>
+        </div>
+      </main>
+      <footer className="bg-gray-100 py-4 mt-auto bg-gray-500">
+        <div className="container mx-auto px-4">
+          <p className="text-center text-gray-600">
+            &copy; {new Date().getFullYear()} Purfect Me. All rights reserved.
+          </p>
+        </div>
+      </footer>
+>>>>>>> c6f584c (feat: Redesign Purfect Me landing page)
       </div>
     </>
-  );
-}
-
-function createRoomName() {
-  return [generateRandomAlphanumeric(4), generateRandomAlphanumeric(4)].join(
-    "-"
   );
 }
