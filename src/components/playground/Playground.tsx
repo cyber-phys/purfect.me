@@ -540,19 +540,17 @@ export default function Playground({
     title: "Game",
     content: (
       <div className="flex flex-col h-full">
-        <PlaygroundTile
+        <div
           className="w-full h-1/2 overflow-y-auto flex"
-          childrenClassName="h-full grow items-start"
         >
           {canvasTileContent}
-        </PlaygroundTile>
+        </div>
         
-        <PlaygroundTile
-          title="Chat"
+        <div
           className="h-1/2 grow flex"
         >
           {chatTileContent}
-        </PlaygroundTile>
+        </div>
       </div>
     ),
   });
@@ -583,7 +581,6 @@ export default function Playground({
         </div>
         {outputs?.includes(PlaygroundOutputs.Chat) && (
           <PlaygroundTile
-            title="Chat"
             className="h-full grow basis-3/4 hidden lg:flex"
           >
             {chatTileContent}
@@ -617,8 +614,7 @@ export default function Playground({
             </PlaygroundTile>
           )} */}
           <PlaygroundTile
-            title="Canvas"
-            className="w-full h-full overflow-y-auto flex"
+j            className="w-full h-full overflow-y-auto flex"
             childrenClassName="h-full grow items-start"
           >
             {canvasTileContent}

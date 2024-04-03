@@ -46,7 +46,7 @@ export const ChatMessage = ({
       <div className="relative">
         <div
           className={`border ${
-            isSelf ? "border-gray-300" : "border-" + accentColor + "-500"
+            isSelf ? "border-gray-700" : "border-" + accentColor + "-700"
           } p-2 rounded`}
         >
           <div
