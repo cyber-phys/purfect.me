@@ -1,7 +1,7 @@
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatMessageInput } from "@/components/chat/ChatMessageInput";
 import { ChatMessage as ComponentsChatMessage } from "@livekit/components-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const inputHeight = 48;
 
@@ -21,6 +21,8 @@ type ChatTileProps = {
 };
 
 export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileProps) => {
+  const [selectedMessageIndex, setSelectedMessageIndex] = useState<number | null>(null);
+
   const handleCommand = (command: string) => {
     const [cmd, arg] = command.slice(1).split(/\[(\d+)\]/);
     const numArg = arg ? parseInt(arg, 10) : undefined;
@@ -54,6 +56,25 @@ export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileP
     }
   }, [containerRef, messages]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowUp") {
+        setSelectedMessageIndex((prevIndex) =>
+          prevIndex !== null ? Math.max(prevIndex - 1, 0) : messages.length - 1
+        );
+      } else if (event.key === "ArrowDown") {
+        setSelectedMessageIndex((prevIndex) =>
+          prevIndex !== null ? Math.min(prevIndex + 1, messages.length - 1) : 0
+        );
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [messages]);
+
   return (
     <div className="flex flex-col gap-4 w-full h-full">
       <div
@@ -72,6 +93,7 @@ export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileP
               isSelf={message.isSelf}
               accentColor={accentColor}
               highlight_word_count={message.highlight_word_count}
+              isSelected={index === selectedMessageIndex}
             />
           ))}
         </div>

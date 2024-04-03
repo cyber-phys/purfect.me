@@ -4,6 +4,7 @@ type ChatMessageProps = {
   name: string;
   isSelf: boolean;
   highlight_word_count: number;
+  isSelected: boolean;
 };
 
 export const ChatMessage = ({
@@ -12,6 +13,7 @@ export const ChatMessage = ({
   accentColor,
   isSelf,
   highlight_word_count,
+  isSelected
 }: ChatMessageProps) => {
   const words = message.split(/(\s+)/);
   let highlightedWords = 0;
@@ -41,14 +43,16 @@ export const ChatMessage = ({
     }
   });
 
+  const borderColorClass = isSelected
+    ? `border-${accentColor}-400`
+    : isSelf
+    ? "border-gray-700"
+    : `border-${accentColor}-700`;
+
   return (
     <div className="flex flex-col">
       <div className="relative">
-        <div
-          className={`border ${
-            isSelf ? "border-gray-700" : "border-" + accentColor + "-700"
-          } p-2 rounded`}
-        >
+        <div className={`border ${borderColorClass} p-2 rounded`}>
           <div
             className={`absolute left-2 top-0 px-2 transform -translate-y-1/2 bg-black text-${
               isSelf ? "gray-700" : accentColor + "-800 text-ts-" + accentColor
