@@ -56,3 +56,107 @@ body {
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+.retro-container {
+  background-color: #f7d1cd;
+  color: #4b0082;
+  font-family: "Courier New", Courier, monospace;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.retro-header {
+  background-color: #ff69b4;
+  padding: 20px;
+  text-align: center;
+}
+
+.retro-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.retro-main {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.retro-subtitle {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.retro-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 2px solid #4b0082;
+  border-radius: 5px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 16px;
+}
+
+.retro-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-gap: 20px;
+}
+
+.retro-card {
+  background-color: #ffc0cb;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.retro-card-image {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.retro-card-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.retro-card-description {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.retro-card-button {
+  background-color: #4b0082;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.retro-about {
+  margin-top: 40px;
+}
+
+.retro-text {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.retro-footer {
+  background-color: #ff69b4;
+  padding: 20px;
+  text-align: center;
+}
+
+.retro-footer-text {
+  font-size: 14px;
+  margin: 0;
+}
