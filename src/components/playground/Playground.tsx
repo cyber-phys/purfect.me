@@ -72,6 +72,8 @@ export interface PlaygroundProps {
   metadata?: PlaygroundMeta[];
   videoFit?: "contain" | "cover";
   characterCard?: Character | null;
+  room: string;
+  setroom: (room: string) => void;
 }
 
 const headerHeight = 56;
@@ -148,6 +150,8 @@ export default function Playground({
   metadata,
   videoFit,
   characterCard,
+  room,
+  setroom,
 }: PlaygroundProps) {
   const [agentState, setAgentState] = useState<AgentState>("offline");
   const [themeColor, setThemeColor] = useState(defaultColor);
@@ -423,6 +427,24 @@ export default function Playground({
             <AudioInputTile frequencies={localMultibandVolume} />
           </ConfigurationPanelItem>
         )}
+        <ConfigurationPanelItem title="Room Name">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={room}
+            onChange={(e) => setroom(e.target.value)}
+            className="w-full p-2 border border-gray-800 rounded bg-black text-violet-500"
+            placeholder="Enter room name"
+          />
+          <Button
+            accentColor={'violet'}
+            className="w-half"
+            onClick={() => setroom(room)}
+          >
+            Update Room
+          </Button>
+        </div>
+      </ConfigurationPanelItem>
         <ConfigurationPanelItem title="Character Prompt">
           <form onSubmit={handleFormSubmit}>
             <textarea

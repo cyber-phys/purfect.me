@@ -103,6 +103,7 @@ export default function Page() {
   const [metadata, setMetadata] = useState<PlaygroundMeta[]>([]);
 
   const [roomName, setRoomName] = useState(createRoomName());
+  // const [roomName, setRoomName] = useState("TESTROOM");
 
   const tokenOptions = useMemo(() => {
     return {
@@ -217,6 +218,8 @@ export default function Page() {
               metadata={metadata}
               videoFit={'cover'}
               characterCard={character}
+              room={roomName}
+              setroom={setRoomName}
             />
             <RoomAudioRenderer />
             <StartAudio label="Click to enable audio playback" />
