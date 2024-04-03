@@ -22,6 +22,7 @@ type ChatTileProps = {
 
 export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileProps) => {
   const [selectedMessageIndex, setSelectedMessageIndex] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleCommand = (command: string) => {
     const [cmd, arg] = command.slice(1).split(/\[(\d+)\]/);
@@ -49,13 +50,6 @@ export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileP
     }
   };
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    }
-  }, [containerRef, messages]);
-
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowUp") {
@@ -68,12 +62,22 @@ export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileP
         );
       }
     };
-
+  
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [messages]);
+  
+  //TODO Scroll to selected message is still sorta broken... 
+  useEffect(() => {
+    if (selectedMessageIndex !== null && containerRef.current) {
+      const selectedMessageElement = containerRef.current.children[selectedMessageIndex];
+      if (selectedMessageElement) {
+        selectedMessageElement.scrollIntoView({ behavior: "smooth", block: "end" });
+      }
+    }
+  }, [selectedMessageIndex]);
 
   return (
     <div className="flex flex-col gap-4 w-full h-full">
