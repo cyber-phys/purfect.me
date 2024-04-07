@@ -77,6 +77,10 @@ export default function App() {
     const [selectedVideoTranscriptionModel, setSelectedVideoTranscriptionModel] = useState<string | undefined>(undefined);
     const [selectedVideoTranscriptionInterval, setSelectedVideoTranscriptionInterval] = useState<string>("60");
     const [selectedVoice, setSelectedVoice] = useState<string | undefined>(undefined);
+    const [isCanvasEnabled, setIsCanvasEnabled] = useState(false)
+    const [selectedCanvasInterval, setSelectedCanvasInterval] = useState<string>("60");
+    const [canvasModel, setCanvasModel] = useState<string | undefined>(undefined);
+
 
     useEffect(() => {
         const fetchModels = async () => {
@@ -97,10 +101,10 @@ export default function App() {
             setIsVideoTranscriptionContinuous(false);
         }
     }, [isVideoTranscriptionEnabled]);
-    
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-    
+
         const payload = {
             name: (event.currentTarget.elements.namedItem("name") as HTMLInputElement | HTMLTextAreaElement)?.value,
             prompt: (event.currentTarget.elements.namedItem("prompt") as HTMLInputElement | HTMLTextAreaElement)?.value,
@@ -112,8 +116,9 @@ export default function App() {
             videoTranscriptionModel: selectedVideoTranscriptionModel || "",
             videoTranscriptionInterval: selectedVideoTranscriptionInterval,
             avatarImage: avatarImage ? await toBase64(avatarImage) : null
+            
         };
-    
+
         try {
             const response = await fetch("/api/new-character", {
                 method: "POST",
@@ -122,7 +127,7 @@ export default function App() {
                 },
                 body: JSON.stringify(payload),
             });
-    
+
             if (response.ok) {
                 const data: CharacterResponse = await response.json();
                 const characterId = data.characterId;
@@ -135,7 +140,7 @@ export default function App() {
             console.error("Error creating character:", error);
         }
     };
-    
+
     const toBase64 = (file: File) => new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -264,120 +269,187 @@ export default function App() {
 
     return (
         <div className="flex justify-center items-center h-screen dark text-foreground bg-background p-2">
-        <div className="flex-col border border-violet-400 p-4 rounded w-full max-w-[400px] h-full overflow-hidden">
-            <h1 className="text-violet-200">Create a new character</h1>
-            <ScrollShadow hideScrollBar className="w-full h-full overflow-auto flex flex-col items-center">
-                <div className="py-2">
-                    <div className="flex items-center justify-center space-x-4">
-                        <Avatar
-                            showFallback
-                            src={avatarImage ? URL.createObjectURL(avatarImage) : undefined}
-                            fallback={
-                                <CameraIcon
-                                    className="animate-pulse w-6 h-6 text-default-500 cursor-pointer"
-                                    fill="currentColor"
-                                    size={20}
-                                    onClick={handleAvatarClick}
-                                />
-                            }
-                            onClick={handleAvatarClick}
-                            style={{ cursor: "pointer" }}
-                        />
-                    </div>
-                </div>
-                <form onSubmit={handleSubmit} className="w-full max-w-xs mb-10">
-                    <Textarea
-                        isRequired
-                        label="Name"
-                        name="name"
-                        placeholder="Enter character's name"
-                        variant="bordered"
-                        className="w-full py-2"
-                    />
-                    <Textarea
-                        isRequired
-                        label="Prompt"
-                        name="prompt"
-                        placeholder="Enter character prompt"
-                        variant="bordered"
-                        className="w-full py-2"
-                    />
-                    <div className={`${startingMessages.length > 0 ? 'border border-gray-600 rounded p-2 my-2' : ''} py-2`}>
-                    <div className="flex items-center space-x-2 py-2">
-                        <Textarea
-                            label="Starting Messages"
-                            placeholder="Enter a starting message"
-                            value={currentMessage}
-                            onChange={handleMessageChange}
-                            variant="bordered"
-                            className="w-full"
-                        />
-                        <Button
-                            onClick={handleAddMessage}
-                        >
-                            <PlusIcon fill="currentColor" size={20} />
-                        </Button>
-                    </div>
-                    <ChatBubbles />
-                    </div>
-                    <Select
-                        label="Voice"
-                        placeholder="Choose a voice"
-                        value={selectedVoice}
-                        onChange={(e) => setSelectedVoice(e.target.value)}
-                        className="w-full"
-                    >
-                        {voices.map((voice) => (
-                            <SelectItem key={voice.id} value={voice.id}>
-                                {voice.name}
-                            </SelectItem>
-                        ))}
-                    </Select>                    
-                    <Select
-                        label="Base Model"
-                        placeholder="Choose a model"
-                        value={selectedModel}
-                        onChange={(e) => {
-                            setSelectedModel(e.target.value);
-                            setIsVideoTranscriptionEnabled(multimodalModels.some((model) => model.id === e.target.value));
-                            setIsBaseModelMultiModal(multimodalModels.some((model) => model.id === e.target.value));
-                        }}
-                        className="w-full py-2"
-                    >
-                        {models.map((model) => (
-                            <SelectItem key={model.id} value={model.id}>
-                                {model.name}
-                            </SelectItem>
-                        ))}
-                    </Select>
-                    {getSelectedModelDetails()}
+            <div className="flex-col border border-violet-400 p-4 rounded w-full max-w-[400px] h-full overflow-hidden">
+                <h1 className="text-violet-200">Create a new character</h1>
+                <ScrollShadow hideScrollBar className="w-full h-full overflow-auto flex flex-col items-center">
                     <div className="py-2">
-                        <Switch
-                            isSelected={isVideoTranscriptionEnabled}
-                            // checked={isVideoTranscriptionEnabled}
-                            onChange={(e) => setIsVideoTranscriptionEnabled(e.target.checked)}
-                            isDisabled={multimodalModels.some((model) => model.id === selectedModel)}
-                        >
-                            Video Transcriptions
-                        </Switch>
-                        {isBaseModelMultiModal && (
-                            <p className="text-small text-default-500 text-center">Base model is multimodal</p>
-                        )}
+                        <div className="flex items-center justify-center space-x-4">
+                            <Avatar
+                                showFallback
+                                src={avatarImage ? URL.createObjectURL(avatarImage) : undefined}
+                                fallback={
+                                    <CameraIcon
+                                        className="animate-pulse w-6 h-6 text-default-500 cursor-pointer"
+                                        fill="currentColor"
+                                        size={20}
+                                        onClick={handleAvatarClick}
+                                    />
+                                }
+                                onClick={handleAvatarClick}
+                                style={{ cursor: "pointer" }}
+                            />
+                        </div>
                     </div>
-                    {isVideoTranscriptionEnabled && (
+                    <form onSubmit={handleSubmit} className="w-full max-w-xs mb-10">
+                        <Textarea
+                            isRequired
+                            label="Name"
+                            name="name"
+                            placeholder="Enter character's name"
+                            variant="bordered"
+                            className="w-full py-2"
+                        />
+                        <Textarea
+                            isRequired
+                            label="Prompt"
+                            name="prompt"
+                            placeholder="Enter character prompt"
+                            variant="bordered"
+                            className="w-full py-2"
+                        />
+                        <div className={`${startingMessages.length > 0 ? 'border border-gray-600 rounded p-2 my-2' : ''} py-2`}>
+                            <div className="flex items-center space-x-2 py-2">
+                                <Textarea
+                                    label="Starting Messages"
+                                    placeholder="Enter a starting message"
+                                    value={currentMessage}
+                                    onChange={handleMessageChange}
+                                    variant="bordered"
+                                    className="w-full"
+                                />
+                                <Button
+                                    onClick={handleAddMessage}
+                                >
+                                    <PlusIcon fill="currentColor" size={20} />
+                                </Button>
+                            </div>
+                            <ChatBubbles />
+                        </div>
+                        <Select
+                            label="Voice"
+                            placeholder="Choose a voice"
+                            value={selectedVoice}
+                            onChange={(e) => setSelectedVoice(e.target.value)}
+                            className="w-full"
+                        >
+                            {voices.map((voice) => (
+                                <SelectItem key={voice.id} value={voice.id}>
+                                    {voice.name}
+                                </SelectItem>
+                            ))}
+                        </Select>
+                        <Select
+                            label="Base Model"
+                            placeholder="Choose a model"
+                            value={selectedModel}
+                            onChange={(e) => {
+                                setSelectedModel(e.target.value);
+                                setIsVideoTranscriptionEnabled(multimodalModels.some((model) => model.id === e.target.value));
+                                setIsBaseModelMultiModal(multimodalModels.some((model) => model.id === e.target.value));
+                            }}
+                            className="w-full py-2"
+                        >
+                            {models.map((model) => (
+                                <SelectItem key={model.id} value={model.id}>
+                                    {model.name}
+                                </SelectItem>
+                            ))}
+                        </Select>
+                        {getSelectedModelDetails()}
+                        <div className="py-2">
+                            <Switch
+                                isSelected={isVideoTranscriptionEnabled}
+                                // checked={isVideoTranscriptionEnabled}
+                                onChange={(e) => setIsVideoTranscriptionEnabled(e.target.checked)}
+                                isDisabled={multimodalModels.some((model) => model.id === selectedModel)}
+                            >
+                                Video Transcriptions
+                            </Switch>
+                            {isBaseModelMultiModal && (
+                                <p className="text-small text-default-500 text-center">Base model is multimodal</p>
+                            )}
+                        </div>
+                        {isVideoTranscriptionEnabled && (
+                            <div>
+                                <Switch
+                                    isSelected={isVideoTranscriptionContinuous && isVideoTranscriptionEnabled}
+                                    onChange={(e) => setIsVideoTranscriptionContinuous(e.target.checked)}
+                                >
+                                    Continous Video Transcription
+                                </Switch>
+                                {isVideoTranscriptionEnabled && isVideoTranscriptionContinuous && (
+                                    <div className="py-2">
+                                        <Select
+                                            label="Video Transcription Interval"
+                                            value={selectedVideoTranscriptionInterval}
+                                            onChange={(e) => setSelectedVideoTranscriptionInterval(e.target.value)}
+                                            className="w-full"
+                                        >
+                                            <SelectItem key="5" value="5">5 seconds</SelectItem>
+                                            <SelectItem key="10" value="10">10 seconds</SelectItem>
+                                            <SelectItem key="60" value="60">60 seconds</SelectItem>
+                                        </Select>
+                                    </div>
+                                )}
+                                <Select
+                                    label="Video Transcription Model"
+                                    placeholder="Choose a model"
+                                    value={selectedVideoTranscriptionModel}
+                                    onChange={(e) => setSelectedVideoTranscriptionModel(e.target.value)}
+                                    className="w-full py-2"
+                                >
+                                    {models
+                                        .filter((model) =>
+                                            multimodalModels.some((multimodalModel) => multimodalModel.id === model.id)
+                                        )
+                                        .map((model) => (
+                                            <SelectItem key={model.id} value={model.id}>
+                                                {model.name}
+                                            </SelectItem>
+                                        ))}
+                                </Select>
+                                {getVideoModelDetails()}
+                            </div>
+                        )}
                         <div>
                             <Switch
-                                isSelected={isVideoTranscriptionContinuous && isVideoTranscriptionEnabled}
-                                onChange={(e) => setIsVideoTranscriptionContinuous(e.target.checked)}
+                                isSelected={isCanvasEnabled}
+                                // checked={isVideoTranscriptionEnabled}
+                                onChange={(e) => setIsCanvasEnabled(e.target.checked)}
                             >
-                                Continous Video Transcription
+                                Generative Canavas
                             </Switch>
-                            {isVideoTranscriptionEnabled && isVideoTranscriptionContinuous && (
+                        </div>
+                        {isCanvasEnabled && (
+                            <div>
+                                <Textarea
+                                    isRequired
+                                    label="Canvas Prompt"
+                                    name="canvasPrompt"
+                                    placeholder="Enter Canvas prompt"
+                                    variant="bordered"
+                                    className="w-full py-2"
+                                />
+                                <Select
+                                    label="Canvas Model"
+                                    placeholder="Choose a model"
+                                    value={selectedModel}
+                                    onChange={(e) => {
+                                        setCanvasModel(e.target.value);
+                                    }}
+                                    className="w-full py-2"
+                                >
+                                    {models.map((model) => (
+                                        <SelectItem key={model.id} value={model.id}>
+                                            {model.name}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
                                 <div className="py-2">
                                     <Select
                                         label="Video Transcription Interval"
-                                        value={selectedVideoTranscriptionInterval}
-                                        onChange={(e) => setSelectedVideoTranscriptionInterval(e.target.value)}
+                                        value={selectedCanvasInterval}
+                                        onChange={(e) => setSelectedCanvasInterval(e.target.value)}
                                         className="w-full"
                                     >
                                         <SelectItem key="5" value="5">5 seconds</SelectItem>
@@ -385,34 +457,15 @@ export default function App() {
                                         <SelectItem key="60" value="60">60 seconds</SelectItem>
                                     </Select>
                                 </div>
-                            )}
-                            <Select
-                                label="Video Transcription Model"
-                                placeholder="Choose a model"
-                                value={selectedVideoTranscriptionModel}
-                                onChange={(e) => setSelectedVideoTranscriptionModel(e.target.value)}
-                                className="w-full py-2"
-                            >
-                                {models
-                                    .filter((model) =>
-                                        multimodalModels.some((multimodalModel) => multimodalModel.id === model.id)
-                                    )
-                                    .map((model) => (
-                                        <SelectItem key={model.id} value={model.id}>
-                                            {model.name}
-                                        </SelectItem>
-                                    ))}
-                            </Select>
-                            {getVideoModelDetails()}
-                        </div>
-                    )}
-                    <button
-                        type="submit"
-                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-                    >
-                        Submit
-                    </button>
-                </form>
+                            </div>
+                        )}
+                        <button
+                            type="submit"
+                            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+                        >
+                            Submit
+                        </button>
+                    </form>
                 </ScrollShadow>
             </div>
         </div>
