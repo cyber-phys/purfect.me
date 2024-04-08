@@ -46,19 +46,20 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function Page() {
   const router = useRouter();
-  const { id, room } = router.query;
+  const { slug, room } = router.query;
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [characterId, setCharacterId] = useState<String>();
+  const [characterId, setCharacterId] = useState<string | undefined>();
   const [roomName, setRoomName] = useState(createRoomName());
 
   useEffect(() => {
     const fetchCharacter = async () => {
-      let characterId = id;
+      let characterId = slug;
+      setCharacterId(slug as string)
 
       if (room) {
-        setRoomName(Array.isArray(room) ? room[0] : room);
+        setRoomName(room as string);
       }
 
       if (!characterId) {
@@ -225,7 +226,7 @@ export default function Page() {
               characterCard={character}
               room={roomName}
               setroom={setRoomName}
-              characterId={id as string}
+              characterId={characterId??''}
             />
             <RoomAudioRenderer />
             <StartAudio label="Click to enable audio playback" />

@@ -155,7 +155,7 @@ export default function Playground({
   characterCard,
   room,
   setroom,
-  characterId
+  characterId,
 }: PlaygroundProps) {
   const [agentState, setAgentState] = useState<AgentState>("offline");
   const [themeColor, setThemeColor] = useState(defaultColor);
@@ -442,8 +442,8 @@ export default function Playground({
             onChange={(e) => setroom(e.target.value)}
             className="w-full p-2 border border-gray-800 rounded bg-black text-violet-500"
             placeholder="Enter room name"
-          /> */}
-          {/* <Button
+          />
+          <Button
             accentColor={'violet'}
             className="w-half"
             onClick={() => setroom(room)}
@@ -453,7 +453,7 @@ export default function Playground({
           <Button
             accentColor={'violet'}
             className="w-half"
-            onClick={() => navigator.clipboard.writeText(`https://yourdomain.com/room/${}/${room}`)}
+            onClick={() => navigator.clipboard.writeText(`https://purfect.me/talk/${characterId}?room=${room}`)}
           >
             Copy Invite Link
           </Button>
