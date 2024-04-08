@@ -35,6 +35,8 @@ import { QRCodeSVG } from "qrcode.react";
 import { ReactNode, useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Button } from "../button/Button";
 import { useChat } from "@/components/chat/useChat";
+import ConnectionModal from "./ConnectModal";
+import LoadingScreen from "./LoadingScreen";
 
 interface Character {
   name: string;
@@ -579,6 +581,8 @@ export default function Playground({
 
   return (
     <>
+          {roomState === ConnectionState.Connected ? (
+<>
       <PlaygroundHeader
         title={title}
         logo={logo}
@@ -594,30 +598,34 @@ export default function Playground({
         className={`flex gap-4 py-4 grow w-full selection:bg-${themeColor}-900`}
         style={{ height: `calc(100% - ${headerHeight}px)` }}
       >
-        <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
-          <PlaygroundTabbedTile
-            className="h-full"
-            tabs={mobileTabs}
-            initialTab={mobileTabs.length - 1}
-          />
-        </div>
-        {outputs?.includes(PlaygroundOutputs.Chat) && (
-          <PlaygroundTile
-            className="h-full grow basis-3/4 hidden lg:flex"
-          >
-            {chatTileContent}
-          </PlaygroundTile>
-        )}
-        <div className="flex-col grow basis-1/4 gap-4 h-full hidden lg:flex">
-          <PlaygroundTile
-            padding={false}
-            backgroundColor="gray-950"
-            className="w-full h-1/2 grow"
-            childrenClassName="justify-center"
-          >
-            {settingsTileContent}
-          </PlaygroundTile>
-          {/* {outputs?.includes(PlaygroundOutputs.Video) && (
+        {['offline', 'starting'].includes(agentState) ? ( 
+          <LoadingScreen/>
+          ):(
+          <>
+            <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
+              <PlaygroundTabbedTile
+                className="h-full"
+                tabs={mobileTabs}
+                initialTab={mobileTabs.length - 1}
+              />
+            </div>
+            {outputs?.includes(PlaygroundOutputs.Chat) && (
+              <PlaygroundTile
+                className="h-full grow basis-3/4 hidden lg:flex"
+              >
+                {chatTileContent}
+              </PlaygroundTile>
+            )}
+            <div className="flex-col grow basis-1/4 gap-4 h-full hidden lg:flex">
+              <PlaygroundTile
+                padding={false}
+                backgroundColor="gray-950"
+                className="w-full h-1/2 grow"
+                childrenClassName="justify-center"
+              >
+                {settingsTileContent}
+              </PlaygroundTile>
+              {/* {outputs?.includes(PlaygroundOutputs.Video) && (
             <PlaygroundTile
               title="Video"
               className="w-full h-full grow"
@@ -626,7 +634,7 @@ export default function Playground({
               {videoTileContent}
             </PlaygroundTile>
           )} */}
-          {/* {outputs?.includes(PlaygroundOutputs.Audio) && (
+              {/* {outputs?.includes(PlaygroundOutputs.Audio) && (
             <PlaygroundTile
               title="Audio"
               className="w-full h-1/2 grow"
@@ -635,14 +643,27 @@ export default function Playground({
               {audioTileContent}
             </PlaygroundTile>
           )} */}
-          <PlaygroundTile
-            className="w-full h-full overflow-y-auto flex"
-            childrenClassName="h-full grow items-start"
-          >
-            {canvasTileContent}
-          </PlaygroundTile>
-        </div>
+              <PlaygroundTile
+                className="w-full h-full overflow-y-auto flex"
+                childrenClassName="h-full grow items-start"
+              >
+                {canvasTileContent}
+              </PlaygroundTile>
+            </div>
+          </>
+        )}
       </div>
+</>
+      ) : (
+        <ConnectionModal
+          isOpen={roomState === ConnectionState.Disconnected || roomState === ConnectionState.Connecting}
+          onClose={() => {/* handle modal close logic here */ }}
+          onConnect={() => onConnect(true)}
+          themeColor={themeColor}
+          headerHeight={headerHeight}
+          agentState={agentState}
+        />
+      )}
     </>
   );
 }
