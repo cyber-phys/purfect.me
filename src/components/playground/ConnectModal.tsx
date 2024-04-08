@@ -48,7 +48,7 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ isOpen, onClose, onCo
         </ModalHeader>
         <ModalBody>
           <p>
-            Welcome to Purfect, we enable quantum link calls to other worlds. This is a voice driven experince so please enable mic permissions when prompted on your device. Thx XXO hope you enjoy what we are building. 
+            Welcome to Purfect, we enable quantum link calls to other worlds. This is a voice driven experince so please enable mic permissions when prompted on your device. Thx hope you enjoy what we are building. xoxo
           </p>
         </ModalBody>
         <ModalFooter>
