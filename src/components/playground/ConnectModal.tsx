@@ -47,9 +47,7 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ isOpen, onClose, onCo
           <p className="text-white text-xl">Connect to quantum realm</p>
         </ModalHeader>
         <ModalBody>
-          <p>
-            Welcome to Purfect, we enable quantum link calls to other worlds. This is a voice driven experince so please enable mic permissions when prompted on your device. Thx hope you enjoy what we are building. xoxo
-          </p>
+          <p>Welcome to Purfect, the app that enables quantum link calls to other worlds! This is a voice-driven experience, so please enable microphone permissions when prompted on your device. Feel free to converse naturally - you can interrupt the voice at the other end by talking or sending a message. However, its always polite to let someone finish their thoughts. Thank you, and we hope you enjoy what were building! xoxo </p>
         </ModalBody>
         <ModalFooter>
           {/* <Button auto flat color="error" onClick={handleClose}>
