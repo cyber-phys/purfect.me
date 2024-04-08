@@ -6,4 +6,5 @@ interface CloudflareEnv {
     //`tsconfig.json` file under `compilerOptions.types`.
     CHARACTERS_KV: KVNamespace
     AVATARS_R2: R2Bucket
+    CHARACTERS_DB: D1Database
   }

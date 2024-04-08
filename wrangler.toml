@@ -9,3 +9,8 @@ id = "fc3792d034ec4018bb9aee0768f60411"
 [[r2_buckets]]
 binding = 'AVATARS_R2'
 bucket_name = 'avatars-dev'
+
+[[ d1_databases ]]
+binding = "CHARACTERS_DB"
+database_name = "characters"
+database_id = "f3cd1331-7ea6-4bb6-b58b-8a4b4d5ed6e4"

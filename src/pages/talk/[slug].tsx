@@ -19,17 +19,27 @@ import Playground, {
 import { PlaygroundToast, ToastType } from "@/components/toast/PlaygroundToast";
 import { useAppConfig } from "@/hooks/useAppConfig";
 
-interface Character {
+type CharacterCard = {
+  id: string;
   name: string;
-  prompt: string;
-  startingMessages: string[];
+  character_prompt: string;
+  video_system_prompt: string;
+  video_prompt: string;
+  canvas_system_prompt: string;
+  canvas_prompt: string;
+  starting_messages: string[]; // Array of strings
   voice: string;
-  baseModel: string;
-  isVideoTranscriptionEnabled: boolean;
-  isVideoTranscriptionContinuous: boolean;
-  videoTranscriptionModel: string;
-  videoTranscriptionInterval: string;
-}
+  base_model: string;
+  is_video_transcription_enabled: number; // 1 for true, 0 for false
+  is_video_transcription_continuous: number; // 1 for true, 0 for false
+  video_transcription_model: string;
+  video_transcription_interval: number;
+  is_canvas_enabled: number; // 1 for true, 0 for false
+  canvas_model: string;
+  canvas_interval: number;
+  bio: string;
+  creation_time: string;
+};
 
 const themeColors = [
   "cyan",
@@ -47,7 +57,7 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Page() {
   const router = useRouter();
   const { slug, room } = router.query;
-  const [character, setCharacter] = useState<Character | null>(null);
+  const [character, setCharacter] = useState<CharacterCard | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [characterId, setCharacterId] = useState<string | undefined>();
@@ -69,7 +79,7 @@ export default function Page() {
       try {
         const response = await fetch(`/api/get-character?id=${characterId}`);
         if (response.ok) {
-          const data: Character = await response.json();
+          const data: CharacterCard = await response.json();
           setCharacter(data);
           console.log(data);
         } else {
@@ -82,7 +92,7 @@ export default function Page() {
           // Try fetching with the default character ID if the slug was provided but failed
           const defaultResponse = await fetch(`/api/get-character?id=${process.env.NEXT_PUBLIC_DEFAULT_CHARACTER_ID}`);
           if (defaultResponse.ok) {
-            const defaultData: Character = await defaultResponse.json();
+            const defaultData: CharacterCard = await defaultResponse.json();
             setCharacter(defaultData);
             console.log(defaultData);
           } else {

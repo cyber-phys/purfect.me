@@ -79,8 +79,8 @@ export default function App() {
     const [selectedVoice, setSelectedVoice] = useState<string | undefined>(undefined);
     const [isCanvasEnabled, setIsCanvasEnabled] = useState(false)
     const [selectedCanvasInterval, setSelectedCanvasInterval] = useState<string>("60");
-    const [canvasModel, setCanvasModel] = useState<string | undefined>(undefined);
-
+    const [selectedCanvasModel, setSelectedCanvasModel] = useState<string | undefined>(undefined);
+    const [advanced, setAdvanced] = useState(false);
 
     useEffect(() => {
         const fetchModels = async () => {
@@ -107,16 +107,24 @@ export default function App() {
 
         const payload = {
             name: (event.currentTarget.elements.namedItem("name") as HTMLInputElement | HTMLTextAreaElement)?.value,
-            prompt: (event.currentTarget.elements.namedItem("prompt") as HTMLInputElement | HTMLTextAreaElement)?.value,
-            startingMessages: startingMessages,
+            bio: (event.currentTarget.elements.namedItem("bio") as HTMLInputElement | HTMLTextAreaElement)?.value,
+            characterSystemPrompt: (event.currentTarget.elements.namedItem("characterSystemPrompt") as HTMLInputElement | HTMLTextAreaElement)?.value,
+            characterPrompt: (event.currentTarget.elements.namedItem("characterPrompt") as HTMLInputElement | HTMLTextAreaElement)?.value,
+            videoSystemPrompt: (event.currentTarget.elements.namedItem("videoSystemPrompt") as HTMLInputElement | HTMLTextAreaElement)?.value,
+            videoPrompt: (event.currentTarget.elements.namedItem("videoPrompt") as HTMLInputElement | HTMLTextAreaElement)?.value,
+            canvasSystemPrompt: (event.currentTarget.elements.namedItem("canvasSystemPrompt") as HTMLInputElement | HTMLTextAreaElement)?.value,
+            canvasPrompt: (event.currentTarget.elements.namedItem("canvasPrompt") as HTMLInputElement | HTMLTextAreaElement)?.value,
+            startingMessages: startingMessages, //TODO We need to take any message in starting messages and append it to array if it exsits
             voice: selectedVoice || "",
             baseModel: selectedModel || "",
             isVideoTranscriptionEnabled: isVideoTranscriptionEnabled,
             isVideoTranscriptionContinuous: isVideoTranscriptionContinuous,
             videoTranscriptionModel: selectedVideoTranscriptionModel || "",
             videoTranscriptionInterval: selectedVideoTranscriptionInterval,
+            isCanvasEnabled: isCanvasEnabled,
+            canvasModel: selectedCanvasModel,
+            CanvasInterval: selectedCanvasInterval,
             avatarImage: avatarImage ? await toBase64(avatarImage) : null
-            
         };
 
         try {
@@ -301,8 +309,16 @@ export default function App() {
                         />
                         <Textarea
                             isRequired
+                            label="Bio"
+                            name="bio"
+                            placeholder="Enter the character's bio"
+                            variant="bordered"
+                            className="w-full py-2"
+                        />
+                        <Textarea
+                            isRequired
                             label="Prompt"
-                            name="prompt"
+                            name="characterPrompt"
                             placeholder="Enter character prompt"
                             variant="bordered"
                             className="w-full py-2"
@@ -433,9 +449,9 @@ export default function App() {
                                 <Select
                                     label="Canvas Model"
                                     placeholder="Choose a model"
-                                    value={selectedModel}
+                                    value={selectedCanvasModel}
                                     onChange={(e) => {
-                                        setCanvasModel(e.target.value);
+                                        setSelectedCanvasModel(e.target.value);
                                     }}
                                     className="w-full py-2"
                                 >
@@ -447,7 +463,7 @@ export default function App() {
                                 </Select>
                                 <div className="py-2">
                                     <Select
-                                        label="Video Transcription Interval"
+                                        label="Canvas Generation Interval"
                                         value={selectedCanvasInterval}
                                         onChange={(e) => setSelectedCanvasInterval(e.target.value)}
                                         className="w-full"
@@ -457,6 +473,42 @@ export default function App() {
                                         <SelectItem key="60" value="60">60 seconds</SelectItem>
                                     </Select>
                                 </div>
+                            </div>
+                        )}
+                          <div>
+                            <Switch
+                                isSelected={advanced}
+                                // checked={isVideoTranscriptionEnabled}
+                                onChange={(e) => setAdvanced(e.target.checked)}
+                            >
+                                Advanced Settings
+                            </Switch>
+                        </div>
+                        {advanced && (
+                            <div>
+                                <p>Don't touch these unless you know what you are doing.</p>
+                                <Textarea
+                                    label="Character System Prompt"
+                                    name="characterSystemPrompt"
+                                    placeholder="Enter Enter Canvas prompt"
+                                    variant="bordered"
+                                    className="w-full py-2"
+                                />
+                                <Textarea
+                                    label="Video System Prompt"
+                                    name="VideoSystemPrompt"
+                                    placeholder="Enter Enter Canvas prompt"
+                                    variant="bordered"
+                                    className="w-full py-2"
+                                />
+                                <Textarea
+                                    label="Canvas System Prompt"
+                                    name="canvasSystemPrompt"
+                                    placeholder="Enter Enter Canvas prompt"
+                                    variant="bordered"
+                                    className="w-full py-2"
+                                />
+                                
                             </div>
                         )}
                         <button

@@ -17,19 +17,31 @@ export default async function handler(req: NextRequest) {
             });
         }
 
-        const myKv = getRequestContext().env.CHARACTERS_KV;
+        const db = getRequestContext().env.CHARACTERS_DB;
 
-        // Retrieve the character data from KV store
-        const characterData = await myKv.get(characterId);
+        // Query the character data from the Cloudflare D1 database
+        const characterData = await db.prepare(`
+            SELECT * FROM characters WHERE id = ?
+        `).bind(characterId).all();
 
-        if (!characterData) {
+        if (!characterData || characterData.length === 0) {
             return new Response(JSON.stringify({ message: "Character not found" }), {
                 status: 404,
                 headers: { "Content-Type": "application/json" },
             });
         }
 
-        return new Response(characterData, {
+        // Assuming characterData is an array of results, we take the first one
+        console.log(characterData)
+        const character = characterData.results[0];
+        console.log(character)
+
+
+        if (character && character.starting_messages) {
+            character.starting_messages = JSON.parse(character.starting_messages);
+        }
+
+        return new Response(JSON.stringify(character), {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });

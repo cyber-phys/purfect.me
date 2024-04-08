@@ -38,17 +38,27 @@ import { useChat } from "@/components/chat/useChat";
 import ConnectionModal from "./ConnectModal";
 import LoadingScreen from "./LoadingScreen";
 
-interface Character {
+type CharacterCard = {
+  id: string;
   name: string;
-  prompt: string;
-  startingMessages: string[];
+  character_prompt: string;
+  video_system_prompt: string;
+  video_prompt: string;
+  canvas_system_prompt: string;
+  canvas_prompt: string;
+  starting_messages: string[]; // Array of strings
   voice: string;
-  baseModel: string;
-  isVideoTranscriptionEnabled: boolean;
-  isVideoTranscriptionContinuous: boolean;
-  videoTranscriptionModel: string;
-  videoTranscriptionInterval: string;
-}
+  base_model: string;
+  is_video_transcription_enabled: number; // 1 for true, 0 for false
+  is_video_transcription_continuous: number; // 1 for true, 0 for false
+  video_transcription_model: string;
+  video_transcription_interval: number;
+  is_canvas_enabled: number; // 1 for true, 0 for false
+  canvas_model: string;
+  canvas_interval: number;
+  bio: string;
+  creation_time: string;
+};
 
 export enum PlaygroundOutputs {
   Video,
@@ -73,7 +83,7 @@ export interface PlaygroundProps {
   onConnect: (connect: boolean, opts?: { token: string; url: string }) => void;
   metadata?: PlaygroundMeta[];
   videoFit?: "contain" | "cover";
-  characterCard?: Character | null;
+  characterCard?: CharacterCard | null;
   room: string;
   setroom: (room: string) => void;
   characterId: string;
