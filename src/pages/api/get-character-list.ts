@@ -21,7 +21,7 @@ export default async function handler(req: NextRequest) {
         const charactersData = await db.prepare(`
         SELECT id, name, voice, base_model, bio, creation_time FROM characters`).all();
 
-        if (!charactersData || charactersData.length === 0) {
+        if (!charactersData || charactersData.results.length === 0) {
             return new Response(JSON.stringify({ message: "No characters found" }), {
                 status: 404,
                 headers: { "Content-Type": "application/json" },
