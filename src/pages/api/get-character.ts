@@ -24,7 +24,7 @@ export default async function handler(req: NextRequest) {
             SELECT * FROM characters WHERE id = ?
         `).bind(characterId).all();
 
-        if (!characterData || characterData.length === 0) {
+        if (!characterData || characterData.length.results === 0) {
             return new Response(JSON.stringify({ message: "Character not found" }), {
                 status: 404,
                 headers: { "Content-Type": "application/json" },
