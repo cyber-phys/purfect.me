@@ -1,32 +1,19 @@
 import { Inter } from "next/font/google";
 import Head from "next/head";
-import { useState } from "react";
 import { useRouter } from 'next/router';
+import { useState, useEffect } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
-interface Character {
+type Character = {
   id: string;
   name: string;
-  image: string;
-  description: string;
-}
+  voice: string;
+  base_model: string;
+  bio: string;
+  creation_time: string;
+};
 
-const characters: Character[] = [
-  {
-    id: "5a277c5d-a660-4b77-8dc2-4f7c2d7bdaf6",
-    name: "Purfect Operator",
-    image: "/character1.png",
-    description: "Your purfect feline friend",
-  },
-  {
-    id: "2",
-    name: "World Sim",
-    image: "/character2.png",
-    description: "Claud world sim",
-  },
-  // Add more characters...
-];
 
 const RetroCard = ({ character }: { character: Character }) => {
   const router = useRouter();
@@ -37,10 +24,10 @@ const RetroCard = ({ character }: { character: Character }) => {
 
   return (
     <div className="retro-card" onClick={handleCardClick}>
-      <img src={character.image} alt={character.name} className="retro-card-image" />
+      {/* <img src={character.image} alt={character.name} className="retro-card-image" /> */}
       <div className="retro-card-content">
         <h3 className="retro-card-title">{character.name}</h3>
-        <p className="retro-card-description">{character.description}</p>
+        <p className="retro-card-description">{character.bio}</p>
         <button className="retro-card-button">Chat Now</button>
       </div>
     </div>
@@ -50,10 +37,32 @@ const RetroCard = ({ character }: { character: Character }) => {
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const [characters, setCharacters] = useState<Character[]>([]);
 
-  const filteredCharacters = characters.filter((character) =>
+  const filteredCharacters = characters.filter((character: Character) =>
     character.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  useEffect(() => {
+    async function fetchCharacters() {
+      try {
+        const response = await fetch('/api/get-character-list');
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setCharacters(data);
+        } else {
+          console.error('Data is not an array:', data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch characters:', error);
+      }
+    }
+  
+    fetchCharacters();
+  }, []);
 
   const handleCreateNewCharacter = () => {
     router.push('/create');
