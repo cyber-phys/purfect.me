@@ -76,6 +76,7 @@ export interface PlaygroundProps {
   characterCard?: Character | null;
   room: string;
   setroom: (room: string) => void;
+  characterId: string;
 }
 
 const headerHeight = 56;
@@ -154,6 +155,7 @@ export default function Playground({
   characterCard,
   room,
   setroom,
+  characterId
 }: PlaygroundProps) {
   const [agentState, setAgentState] = useState<AgentState>("offline");
   const [themeColor, setThemeColor] = useState(defaultColor);
@@ -431,23 +433,33 @@ export default function Playground({
         )}
         <ConfigurationPanelItem title="Room Name">
         <div className="flex gap-2">
-          <input
+          <p className="w-full p-2 rounded text-violet-500">
+          {room}
+          </p>
+          {/* <input
             type="text"
             value={room}
             onChange={(e) => setroom(e.target.value)}
             className="w-full p-2 border border-gray-800 rounded bg-black text-violet-500"
             placeholder="Enter room name"
-          />
-          <Button
+          /> */}
+          {/* <Button
             accentColor={'violet'}
             className="w-half"
             onClick={() => setroom(room)}
           >
             Update Room
+          </Button> */}
+          <Button
+            accentColor={'violet'}
+            className="w-half"
+            onClick={() => navigator.clipboard.writeText(`https://yourdomain.com/room/${}/${room}`)}
+          >
+            Copy Invite Link
           </Button>
         </div>
       </ConfigurationPanelItem>
-        <ConfigurationPanelItem title="Character Prompt">
+        {/* <ConfigurationPanelItem title="Character Prompt">
           <form onSubmit={handleFormSubmit}>
             <textarea
               ref={characterPromptRef}
@@ -464,7 +476,7 @@ export default function Playground({
               Update Prompt
             </Button>
           </form>
-        </ConfigurationPanelItem>
+        </ConfigurationPanelItem> */}
       </div>
     );
   }, [

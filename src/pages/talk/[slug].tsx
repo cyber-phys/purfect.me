@@ -46,15 +46,21 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function Page() {
   const router = useRouter();
-  const { slug } = router.query;
+  const { id, room } = router.query;
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [characterId, setCharacterId] = useState<String>();
+  const [roomName, setRoomName] = useState(createRoomName());
 
   useEffect(() => {
     const fetchCharacter = async () => {
-      let characterId = slug;
-  
+      let characterId = id;
+
+      if (room) {
+        setRoomName(Array.isArray(room) ? room[0] : room);
+      }
+
       if (!characterId) {
         characterId = process.env.NEXT_PUBLIC_DEFAULT_CHARACTER_ID;
       }
@@ -102,7 +108,6 @@ export default function Page() {
   const [customToken, setCustomToken] = useState<string>();
   const [metadata, setMetadata] = useState<PlaygroundMeta[]>([]);
 
-  const [roomName, setRoomName] = useState(createRoomName());
   // const [roomName, setRoomName] = useState("TESTROOM");
 
   const tokenOptions = useMemo(() => {
@@ -220,6 +225,7 @@ export default function Page() {
               characterCard={character}
               room={roomName}
               setroom={setRoomName}
+              characterId={id as string}
             />
             <RoomAudioRenderer />
             <StartAudio label="Click to enable audio playback" />
