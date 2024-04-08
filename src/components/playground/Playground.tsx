@@ -603,7 +603,7 @@ export default function Playground({
         accentColor={themeColor}
         connectionState={roomState}
         onConnectClicked={() =>
-          onConnect(roomState === ConnectionState.Disconnected)
+          onConnect(roomState === ConnectionState.Disconnected as ConnectionState)
         }
       />
       <div

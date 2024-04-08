@@ -55,7 +55,7 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ isOpen, onClose, onCo
           {/* <Button auto flat color="error" onClick={handleClose}>
             Cancel
           </Button> */}
-          <Button auto onClick={handleConnect}>
+          <Button onClick={handleConnect}>
             Connect
           </Button>
         </ModalFooter>
