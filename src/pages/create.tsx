@@ -486,7 +486,7 @@ export default function App() {
                         </div>
                         {advanced && (
                             <div>
-                                <p>Don't touch these unless you know what you are doing.</p>
+                                <p>Dont touch these unless you know what you are doing.</p>
                                 <Textarea
                                     label="Character System Prompt"
                                     name="characterSystemPrompt"
