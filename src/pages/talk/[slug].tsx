@@ -47,10 +47,6 @@ export default function Page() {
       let characterId = slug;
       setCharacterId(slug as string);
 
-      if (room) {
-        setRoomName(room as string);
-      }
-
       if (!characterId) {
         characterId = process.env.NEXT_PUBLIC_DEFAULT_CHARACTER_ID;
       }
@@ -100,8 +96,6 @@ export default function Page() {
   const [customToken, setCustomToken] = useState<string>();
   const [metadata, setMetadata] = useState<PlaygroundMeta[]>([]);
 
-  // const [roomName, setRoomName] = useState("TESTROOM");
-
   const tokenOptions = useMemo(() => {
     return {
       userInfo: { identity: generateRandomAlphanumeric(16) },
@@ -111,9 +105,13 @@ export default function Page() {
   // set a new room name each time the user disconnects so that a new token gets fetched behind the scenes for a different room
   useEffect(() => {
     if (shouldConnect === false) {
-      setRoomName(createRoomName());
+      if (room) {
+        setRoomName(room as string);
+      } else {
+        setRoomName(createRoomName());
+      }
     }
-  }, [shouldConnect]);
+  }, [shouldConnect, room]);
 
   useEffect(() => {
     const md: PlaygroundMeta[] = [];
