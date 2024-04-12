@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Inter } from "next/font/google";
 import Head from "next/head";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 import { IPhoneConnect } from "@/components/iPhoneConnect";
 import Playground, {
@@ -18,28 +18,7 @@ import Playground, {
 } from "@/components/playground/Playground";
 import { PlaygroundToast, ToastType } from "@/components/toast/PlaygroundToast";
 import { useAppConfig } from "@/hooks/useAppConfig";
-
-type CharacterCard = {
-  id: string;
-  name: string;
-  character_prompt: string;
-  video_system_prompt: string;
-  video_prompt: string;
-  canvas_system_prompt: string;
-  canvas_prompt: string;
-  starting_messages: string[]; // Array of strings
-  voice: string;
-  base_model: string;
-  is_video_transcription_enabled: number; // 1 for true, 0 for false
-  is_video_transcription_continuous: number; // 1 for true, 0 for false
-  video_transcription_model: string;
-  video_transcription_interval: number;
-  is_canvas_enabled: number; // 1 for true, 0 for false
-  canvas_model: string;
-  canvas_interval: number;
-  bio: string;
-  creation_time: string;
-};
+import { CharacterCard } from "@/lib/types";
 
 const themeColors = [
   "cyan",
@@ -66,7 +45,7 @@ export default function Page() {
   useEffect(() => {
     const fetchCharacter = async () => {
       let characterId = slug;
-      setCharacterId(slug as string)
+      setCharacterId(slug as string);
 
       if (room) {
         setRoomName(room as string);
@@ -75,7 +54,7 @@ export default function Page() {
       if (!characterId) {
         characterId = process.env.NEXT_PUBLIC_DEFAULT_CHARACTER_ID;
       }
-  
+
       try {
         const response = await fetch(`/api/get-character?id=${characterId}`);
         if (response.ok) {
@@ -83,28 +62,30 @@ export default function Page() {
           setCharacter(data);
           console.log(data);
         } else {
-          setError('Failed to fetch character');
+          setError("Failed to fetch character");
           if (!slug) {
             // If the slug wasn't provided, we already used the default character ID
             setLoading(false);
             return;
           }
           // Try fetching with the default character ID if the slug was provided but failed
-          const defaultResponse = await fetch(`/api/get-character?id=${process.env.NEXT_PUBLIC_DEFAULT_CHARACTER_ID}`);
+          const defaultResponse = await fetch(
+            `/api/get-character?id=${process.env.NEXT_PUBLIC_DEFAULT_CHARACTER_ID}`,
+          );
           if (defaultResponse.ok) {
             const defaultData: CharacterCard = await defaultResponse.json();
             setCharacter(defaultData);
             console.log(defaultData);
           } else {
-            setError('Failed to fetch default character');
+            setError("Failed to fetch default character");
           }
         }
       } catch (error) {
-        setError('An error occurred while fetching the character');
+        setError("An error occurred while fetching the character");
       }
       setLoading(false);
     };
-  
+
     fetchCharacter();
   }, [slug]);
 
@@ -114,7 +95,7 @@ export default function Page() {
   } | null>(null);
   const [shouldConnect, setShouldConnect] = useState(false);
   const [liveKitUrl, setLiveKitUrl] = useState(
-    process.env.NEXT_PUBLIC_LIVEKIT_URL
+    process.env.NEXT_PUBLIC_LIVEKIT_URL,
   );
   const [customToken, setCustomToken] = useState<string>();
   const [metadata, setMetadata] = useState<PlaygroundMeta[]>([]);
@@ -165,16 +146,16 @@ export default function Page() {
       }
       setShouldConnect(connect);
     },
-    []
+    [],
   );
 
   return (
     <>
       <Head>
-        <title>{'Purfect Me'}</title>
+        <title>{"Purfect Me"}</title>
         <meta
           name="description"
-          content={'Quantum multiverse link to your desired reality'}
+          content={"Quantum multiverse link to your desired reality"}
         />
         <meta
           name="viewport"
@@ -182,10 +163,7 @@ export default function Page() {
         />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-        <meta
-          property="og:image"
-          content="https://purfect.me/purfectme.png"
-        />
+        <meta property="og:image" content="https://purfect.me/purfectme.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <link rel="icon" href="/favicon.ico" />
@@ -223,20 +201,20 @@ export default function Page() {
             }}
           >
             <Playground
-              title={'Purfect Me'}
-              githubLink={'https://github.com/distortedmedia'}
+              title={"Purfect Me"}
+              githubLink={"https://github.com/distortedmedia"}
               outputs={outputs}
               showQR={false}
-              description={'Quantum multiverse link to your desired reality'}
+              description={"Quantum multiverse link to your desired reality"}
               themeColors={themeColors}
-              defaultColor={'violet'}
+              defaultColor={"violet"}
               onConnect={handleConnect}
               metadata={metadata}
-              videoFit={'cover'}
+              videoFit={"cover"}
               characterCard={character}
               room={roomName}
               setroom={setRoomName}
-              characterId={characterId??''}
+              characterId={characterId ?? ""}
             />
             <RoomAudioRenderer />
             <StartAudio label="Click to enable audio playback" />
@@ -256,6 +234,6 @@ export default function Page() {
 
 function createRoomName() {
   return [generateRandomAlphanumeric(4), generateRandomAlphanumeric(4)].join(
-    "-"
+    "-",
   );
 }

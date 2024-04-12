@@ -14,7 +14,7 @@ import {
 } from "@/components/playground/PlaygroundTile";
 import { AgentMultibandAudioVisualizer } from "@/components/visualization/AgentMultibandAudioVisualizer";
 import { useMultibandTrackVolume } from "@/hooks/useTrackVolume";
-import { AgentState } from "@/lib/types";
+import { AgentState, CharacterCard } from "@/lib/types";
 import {
   VideoTrack,
   useConnectionState,
@@ -32,7 +32,14 @@ import {
   Track,
 } from "livekit-client";
 import { QRCodeSVG } from "qrcode.react";
-import { ReactNode, useCallback, useEffect, useMemo, useState, useRef } from "react";
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from "react";
 import { Button } from "../button/Button";
 import { useChat } from "@/components/chat/useChat";
 import ConnectionModal from "./ConnectModal";
@@ -48,32 +55,6 @@ function randomSeed(): number {
   const multipliers = [2342534, 1235392, 875441, 102321];
   const multiplier = multipliers[Math.floor(Math.random() * multipliers.length)];
   return Math.floor(Math.random() * multiplier);
-}
-
-type CharacterCard = {
-  id: string;
-  name: string;
-  character_prompt: string;
-  video_system_prompt: string;
-  video_prompt: string;
-  canvas_system_prompt: string;
-  canvas_prompt: string;
-  starting_messages: string[]; // Array of strings
-  voice: string;
-  base_model: string;
-  is_video_transcription_enabled: number; // 1 for true, 0 for false
-  is_video_transcription_continuous: number; // 1 for true, 0 for false
-  video_transcription_model: string;
-  video_transcription_interval: number;
-  is_canvas_enabled: number; // 1 for true, 0 for false
-  canvas_model: string;
-  canvas_interval: number;
-  bio: string;
-  creation_time: string;
-};
-
-interface FALResult {
-  imageUrl: string;
 }
 
 export enum PlaygroundOutputs {
@@ -214,35 +195,35 @@ export default function Playground({
   const agentAudioTrack = tracks.find(
     (trackRef) =>
       trackRef.publication.kind === Track.Kind.Audio &&
-      trackRef.participant.isAgent
+      trackRef.participant.isAgent,
   );
 
   const agentVideoTrack = tracks.find(
     (trackRef) =>
       trackRef.publication.kind === Track.Kind.Video &&
-      trackRef.participant.isAgent
+      trackRef.participant.isAgent,
   );
 
   const subscribedVolumes = useMultibandTrackVolume(
     agentAudioTrack?.publication.track,
-    5
+    5,
   );
 
   const localTracks = tracks.filter(
-    ({ participant }) => participant instanceof LocalParticipant
+    ({ participant }) => participant instanceof LocalParticipant,
   );
 
   const localVideoTrack = localTracks.find(
-    ({ source }) => source === Track.Source.Camera
+    ({ source }) => source === Track.Source.Camera,
   );
 
   const localMicTrack = localTracks.find(
-    ({ source }) => source === Track.Source.Microphone
+    ({ source }) => source === Track.Source.Microphone,
   );
 
   const localMultibandVolume = useMultibandTrackVolume(
     localMicTrack?.publication.track,
-    20
+    20,
   );
 
   useEffect(() => {
@@ -289,24 +270,34 @@ export default function Playground({
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    handleCharacterPromptChange(characterPromptRef.current?.value || '');
+    handleCharacterPromptChange(characterPromptRef.current?.value || "");
   };
 
   const handleCharacterPromptChange = (prompt: string) => {
-    send(new TextEncoder().encode(JSON.stringify({ topic: "character_prompt", prompt })), { reliable: true });
+    send(
+      new TextEncoder().encode(
+        JSON.stringify({ topic: "character_prompt", prompt }),
+      ),
+      { reliable: true },
+    );
   };
 
   useEffect(() => {
     if (agentParticipant) {
-      send(new TextEncoder().encode(JSON.stringify({ topic: "character_prompt", prompt })), { reliable: true });
+      send(
+        new TextEncoder().encode(
+          JSON.stringify({ topic: "character_prompt", prompt }),
+        ),
+        { reliable: true },
+      );
     }
   }, [agentParticipant]);
 
   useEffect(() => {
     if (agentParticipant && characterCard) {
-      const characterCardData = JSON.stringify({ 
-        topic: "character_card", 
-        character: characterCard 
+      const characterCardData = JSON.stringify({
+        topic: "character_card",
+        character: characterCard,
       });
       send(new TextEncoder().encode(characterCardData), { reliable: true });
     }
@@ -471,11 +462,9 @@ export default function Playground({
           </ConfigurationPanelItem>
         )}
         <ConfigurationPanelItem title="Room Name">
-        <div className="flex gap-2">
-          <p className="w-full p-2 rounded text-violet-500">
-          {room}
-          </p>
-          {/* <input
+          <div className="flex gap-2">
+            <p className="w-full p-2 rounded text-violet-500">{room}</p>
+            {/* <input
             type="text"
             value={room}
             onChange={(e) => setroom(e.target.value)}
@@ -489,15 +478,19 @@ export default function Playground({
           >
             Update Room
           </Button> */}
-          <Button
-            accentColor={'violet'}
-            className="w-half"
-            onClick={() => navigator.clipboard.writeText(`https://purfect.me/talk/${characterId}?room=${room}`)}
-          >
-            Copy Invite Link
-          </Button>
-        </div>
-      </ConfigurationPanelItem>
+            <Button
+              accentColor={"violet"}
+              className="w-half"
+              onClick={() =>
+                navigator.clipboard.writeText(
+                  `https://purfect.me/talk/${characterId}?room=${room}`,
+                )
+              }
+            >
+              Copy Invite Link
+            </Button>
+          </div>
+        </ConfigurationPanelItem>
         {/* <ConfigurationPanelItem title="Character Prompt">
           <form onSubmit={handleFormSubmit}>
             <textarea
@@ -642,9 +635,9 @@ const updatedIframeContent = useMemo(() => {
         frameBorder="0"
         className="w-full h-full bg-black hide-scrollbar"
         style={{
-          overflow: 'hidden',
-          scrollbarWidth: 'none', // For Firefox
-          msOverflowStyle: 'none', // For Internet Explorer and Edge
+          overflow: "hidden",
+          scrollbarWidth: "none", // For Firefox
+          msOverflowStyle: "none", // For Internet Explorer and Edge
         }}
       />
     );
@@ -735,68 +728,62 @@ const updatedIframeContent = useMemo(() => {
     title: "Game",
     content: (
       <div className="flex flex-col h-full">
-        <div
-          className="w-full h-1/2 overflow-y-auto flex"
-        >
+        <div className="w-full h-1/2 overflow-y-auto flex">
           {canvasTileContent}
         </div>
-        
-        <div
-          className="h-1/2 grow flex"
-        >
-          {chatTileContent}
-        </div>
+
+        <div className="h-1/2 grow flex">{chatTileContent}</div>
       </div>
     ),
   });
 
   return (
     <>
-          {roomState === ConnectionState.Connected ? (
-<>
-      <PlaygroundHeader
-        title={title}
-        logo={logo}
-        githubLink={githubLink}
-        height={headerHeight}
-        accentColor={themeColor}
-        connectionState={roomState}
-        onConnectClicked={() =>
-          onConnect(roomState === ConnectionState.Disconnected as ConnectionState)
-        }
-      />
-      <div
-        className={`flex gap-4 py-4 grow w-full selection:bg-${themeColor}-900`}
-        style={{ height: `calc(100% - ${headerHeight}px)` }}
-      >
-        {['offline', 'starting'].includes(agentState) ? ( 
-          <LoadingScreen/>
-          ):(
-          <>
-            <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
-              <PlaygroundTabbedTile
-                className="h-full"
-                tabs={mobileTabs}
-                initialTab={mobileTabs.length - 1}
-              />
-            </div>
-            {outputs?.includes(PlaygroundOutputs.Chat) && (
-              <PlaygroundTile
-                className="h-full grow basis-3/4 hidden lg:flex"
-              >
-                {chatTileContent}
-              </PlaygroundTile>
-            )}
-            <div className="flex-col grow basis-1/4 gap-4 h-full hidden lg:flex">
-              <PlaygroundTile
-                padding={false}
-                backgroundColor="gray-950"
-                className="w-full h-1/2 grow"
-                childrenClassName="justify-center"
-              >
-                {settingsTileContent}
-              </PlaygroundTile>
-              {outputs?.includes(PlaygroundOutputs.Video) && (
+      {roomState === ConnectionState.Connected ? (
+        <>
+          <PlaygroundHeader
+            title={title}
+            logo={logo}
+            githubLink={githubLink}
+            height={headerHeight}
+            accentColor={themeColor}
+            connectionState={roomState}
+            onConnectClicked={() =>
+              onConnect(
+                roomState === (ConnectionState.Disconnected as ConnectionState),
+              )
+            }
+          />
+          <div
+            className={`flex gap-4 py-4 grow w-full selection:bg-${themeColor}-900`}
+            style={{ height: `calc(100% - ${headerHeight}px)` }}
+          >
+            {["offline", "starting"].includes(agentState) ? (
+              <LoadingScreen />
+            ) : (
+              <>
+                <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
+                  <PlaygroundTabbedTile
+                    className="h-full"
+                    tabs={mobileTabs}
+                    initialTab={mobileTabs.length - 1}
+                  />
+                </div>
+                {outputs?.includes(PlaygroundOutputs.Chat) && (
+                  <PlaygroundTile className="h-full grow basis-3/4 hidden lg:flex">
+                    {chatTileContent}
+                  </PlaygroundTile>
+                )}
+                <div className="flex-col grow basis-1/4 gap-4 h-full hidden lg:flex">
+                  <PlaygroundTile
+                    padding={false}
+                    backgroundColor="gray-950"
+                    className="w-full h-1/2 grow"
+                    childrenClassName="justify-center"
+                  >
+                    {settingsTileContent}
+                  </PlaygroundTile>
+                  {/* {outputs?.includes(PlaygroundOutputs.Video) && (
             <PlaygroundTile
               title="Video"
               className="w-full h-full grow"
@@ -804,8 +791,8 @@ const updatedIframeContent = useMemo(() => {
             >
               {videoTileContent}
             </PlaygroundTile>
-          )}
-              {/* {outputs?.includes(PlaygroundOutputs.Audio) && (
+          )} */}
+                  {/* {outputs?.includes(PlaygroundOutputs.Audio) && (
             <PlaygroundTile
               title="Audio"
               className="w-full h-1/2 grow"
@@ -814,21 +801,26 @@ const updatedIframeContent = useMemo(() => {
               {audioTileContent}
             </PlaygroundTile>
           )} */}
-              <PlaygroundTile
-                className="w-full h-full overflow-y-auto flex"
-                childrenClassName="h-full grow items-start"
-              >
-                {canvasTileContent}
-              </PlaygroundTile>
-            </div>
-          </>
-        )}
-      </div>
-</>
+                  <PlaygroundTile
+                    className="w-full h-full overflow-y-auto flex"
+                    childrenClassName="h-full grow items-start"
+                  >
+                    {canvasTileContent}
+                  </PlaygroundTile>
+                </div>
+              </>
+            )}
+          </div>
+        </>
       ) : (
         <ConnectionModal
-          isOpen={roomState === ConnectionState.Disconnected || roomState === ConnectionState.Connecting}
-          onClose={() => {/* handle modal close logic here */ }}
+          isOpen={
+            roomState === ConnectionState.Disconnected ||
+            roomState === ConnectionState.Connecting
+          }
+          onClose={() => {
+            /* handle modal close logic here */
+          }}
           onConnect={() => onConnect(true)}
           themeColor={themeColor}
           headerHeight={headerHeight}
