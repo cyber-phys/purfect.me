@@ -1,19 +1,10 @@
 import { Inter } from "next/font/google";
 import Head from "next/head";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
+import { Character } from "@/lib/types";
 
 const inter = Inter({ subsets: ["latin"] });
-
-type Character = {
-  id: string;
-  name: string;
-  voice: string;
-  base_model: string;
-  bio: string;
-  creation_time: string;
-};
-
 
 const RetroCard = ({ character }: { character: Character }) => {
   const router = useRouter();
@@ -40,13 +31,13 @@ export default function Page() {
   const [characters, setCharacters] = useState<Character[]>([]);
 
   const filteredCharacters = characters.filter((character: Character) =>
-    character.name.toLowerCase().includes(searchQuery.toLowerCase())
+    character.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   useEffect(() => {
     async function fetchCharacters() {
       try {
-        const response = await fetch('/api/get-character-list');
+        const response = await fetch("/api/get-character-list");
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
@@ -54,18 +45,18 @@ export default function Page() {
         if (Array.isArray(data)) {
           setCharacters(data);
         } else {
-          console.error('Data is not an array:', data);
+          console.error("Data is not an array:", data);
         }
       } catch (error) {
-        console.error('Failed to fetch characters:', error);
+        console.error("Failed to fetch characters:", error);
       }
     }
-  
+
     fetchCharacters();
   }, []);
 
   const handleCreateNewCharacter = () => {
-    router.push('/create');
+    router.push("/create");
   };
 
   return (
@@ -82,10 +73,7 @@ export default function Page() {
         />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-        <meta
-          property="og:image"
-          content="https://purfect.me/purfectme.png"
-        />
+        <meta property="og:image" content="https://purfect.me/purfectme.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <link rel="icon" href="/favicon.ico" />
@@ -139,10 +127,10 @@ export default function Page() {
           <div className="retro-about">
             <h2 className="retro-subtitle">About Purfect Me</h2>
             <p className="retro-text">
-              Purfect Me is a chatbot role-playing site that allows you to engage
-              in immersive conversations with a variety of characters. Explore
-              different personalities and embark on exciting adventures in a
-              quantum multiverse.
+              Purfect Me is a chatbot role-playing site that allows you to
+              engage in immersive conversations with a variety of characters.
+              Explore different personalities and embark on exciting adventures
+              in a quantum multiverse.
             </p>
           </div>
         </main>

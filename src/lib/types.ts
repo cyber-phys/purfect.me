@@ -23,6 +23,15 @@ export type AgentState =
   | "offline"
   | "starting";
 
+export type Character = {
+  id: string;
+  name: string;
+  voice: string;
+  base_model: string;
+  bio: string;
+  creation_time: string;
+};
+
 export type CharacterCard = {
   id: string;
   name: string;
