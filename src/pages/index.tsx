@@ -79,26 +79,6 @@ export default function Page() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="retro-container">
-        <Head>
-          <title>Purfect Me</title>
-          <meta
-            name="description"
-            content="Quantum multiverse link to your desired reality"
-          />
-          <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-          />
-          <meta name="apple-mobile-web-app-capable" content="yes" />
-          <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-          <meta
-            property="og:image"
-            content="https://purfect.me/purfectme.png"
-          />
-          <meta property="og:image:width" content="1200" />
-          <meta property="og:image:height" content="630" />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
         <header className="retro-header">
           <h1 className="retro-title">Purfect Me</h1>
         </header>
