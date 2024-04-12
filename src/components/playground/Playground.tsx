@@ -268,11 +268,13 @@ export default function Playground({
 
   const { send } = useDataChannel(onDataReceived);
 
+  //TODO: lets get rid of this
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleCharacterPromptChange(characterPromptRef.current?.value || "");
   };
 
+  //TODO: lets get rid of this
   const handleCharacterPromptChange = (prompt: string) => {
     send(
       new TextEncoder().encode(
@@ -282,17 +284,19 @@ export default function Playground({
     );
   };
 
-  useEffect(() => {
-    if (agentParticipant) {
-      send(
-        new TextEncoder().encode(
-          JSON.stringify({ topic: "character_prompt", prompt }),
-        ),
-        { reliable: true },
-      );
-    }
-  }, [agentParticipant]);
+  // Todo lets get rid of this
+  // useEffect(() => {
+  //   if (agentParticipant) {
+  //     send(
+  //       new TextEncoder().encode(
+  //         JSON.stringify({ topic: "character_prompt", prompt }),
+  //       ),
+  //       { reliable: true },
+  //     );
+  //   }
+  // }, [agentParticipant]);
 
+  // Send Character Chard when Agent connects
   useEffect(() => {
     if (agentParticipant && characterCard) {
       const characterCardData = JSON.stringify({
@@ -303,7 +307,6 @@ export default function Playground({
     }
   }, [agentParticipant]);
 
-  // combine transcripts and chat together
   useEffect(() => {
     const allMessages = [];
     for (const msg of chatMessages) {
