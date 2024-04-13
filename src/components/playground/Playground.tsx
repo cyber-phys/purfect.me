@@ -278,6 +278,7 @@ export default function Playground({
         );
         if (decoded.prompt) {
           setSDPrompt(decoded.prompt);
+          console.log(decoded.prompt)
         }
       }
     },
@@ -570,7 +571,6 @@ const updatedIframeContent = useMemo(() => {
 
   const captureIframeAsImage = () => {
     if (iframeRef.current) {
-      console.log("UPDATED IMAGE");
       const iframe = iframeRef.current;
       const iframeWindow = iframe.contentWindow;
   
@@ -605,7 +605,6 @@ const updatedIframeContent = useMemo(() => {
    
   const connection = fal.realtime.connect("fal-ai/lcm", {
     onResult: (result) => {
-      console.log(result);
       setImageUrl(() => result.images[0].url);
     },
     onError: (error) => {
