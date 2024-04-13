@@ -38,6 +38,7 @@ import { useChat } from "@/components/chat/useChat";
 import ConnectionModal from "./ConnectModal";
 import LoadingScreen from "./LoadingScreen";
 import * as fal from "@fal-ai/serverless-client";
+import html2canvas from 'html2canvas';
 
 fal.config({
   proxyUrl: "/api/fal/proxy",
@@ -192,6 +193,8 @@ export default function Playground({
   const roomState = useConnectionState();
   const tracks = useTracks();
   const [imageUrl, setImageUrl] = useState<string>("");
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [canvasImageUrl, setCanvasImageUrl] = useState<string | null>(null);
 
   const participants = useRemoteParticipants({
     updateOnlyOn: [RoomEvent.ParticipantMetadataChanged],
@@ -520,6 +523,72 @@ export default function Playground({
     showQR,
   ]);
 
+  const captureScript = `
+<script>
+  window.addEventListener('message', (event) => {
+    if (event.data === 'captureImage') {
+      html2canvas(document.body).then((canvas) => {
+        const dataURL = canvas.toDataURL('image/png');
+        window.parent.postMessage(dataURL, '*');
+      }).catch((error) => console.error('Error capturing image:', error));
+    }
+  }, false);
+</script>
+`;
+
+const updatedIframeContent = useMemo(() => {
+  // Ensure html2canvas is available in the iframe
+  const html2canvasScript = '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>';
+  // Append the html2canvas script and the capture script to the iframe content
+  return `${iframeContent}${html2canvasScript}${captureScript}`;
+}, [iframeContent]);
+
+  // const captureIframeAsImage = async () => {
+  //   if (iframeRef.current) {
+  //     console.log("UPDATED IMAGE");
+  //     const iframe = iframeRef.current;
+  //     const iframeContent = iframe.contentDocument || iframe.contentWindow?.document;
+  //     if (iframeContent) {
+  //       try {
+  //         const canvas = await html2canvas(iframeContent.body);
+  //         const dataURL = canvas.toDataURL('image/png');
+  //         setCanvasImageUrl(dataURL);
+  //       } catch (error) {
+  //         console.error('Error capturing iframe image:', error);
+  //       }
+  //     }
+  //   }
+  // };
+
+  const captureIframeAsImage = () => {
+    if (iframeRef.current) {
+      console.log("UPDATED IMAGE");
+      const iframe = iframeRef.current;
+      const iframeWindow = iframe.contentWindow;
+  
+      const handleMessage = (event: MessageEvent) => {
+        if (typeof event.data === 'string' && event.data.startsWith('data:image/png;base64,')) {
+          setCanvasImageUrl(event.data);
+          window.removeEventListener('message', handleMessage);
+        }
+      };
+  
+      window.addEventListener('message', handleMessage);
+      iframeWindow?.postMessage('captureImage', '*');
+    }
+  };
+
+  useEffect(() => {
+    if (roomState === ConnectionState.Connected && canvasImageUrl) {
+      connection.send({
+        prompt:
+          "an island near sea, with seagulls, moon shining over the sea, light house, boats in the background, fish flying over the sea",
+        sync_mode: true,
+        image_url: canvasImageUrl,
+      });
+    }
+  }, [roomState, canvasImageUrl]);
+
   fal.config({
     credentials: "6c1ec85f-b8a9-4910-898d-100b321505a3:7ba16cbaadabd0c6cbc2605205450ec8",
   });
@@ -533,35 +602,35 @@ export default function Playground({
       console.error(error);
     },
   });
-   
-  connection.send({
-    prompt:
-      "an island near sea, with seagulls, moon shining over the sea, light house, boats int he background, fish flying over the sea",
-    sync_mode: true,
-    image_url:
-      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==",
-  });
+
+  useEffect(() => {
+    const interval = setInterval(captureIframeAsImage, 100); // Capture every 5 seconds
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   const sdContent = useMemo(() => (
     <div className="w-full h-full bg-black flex items-center justify-center">
-      {imageUrl ? (
+      {canvasImageUrl ? (
         <img
-          src={imageUrl}
-          alt="Generated Image"
+        src={canvasImageUrl || undefined}
+        alt="Generated Image"
           className="max-w-full max-h-full object-contain"
         />
       ) : (
         <div className="text-white">Loading image...</div>
       )}
     </div>
-  ), [imageUrl]);
+  ), [canvasImageUrl]);
 
   const canvasTileContent = useMemo(() => {
     return (
       <iframe
-        srcDoc={iframeContent}
+        ref={iframeRef}
+        srcDoc={updatedIframeContent}
         title="Background"
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-same-origin"
         frameBorder="0"
         className="w-full h-full bg-black hide-scrollbar"
         style={{
@@ -571,7 +640,7 @@ export default function Playground({
         }}
       />
     );
-  }, [themeColor, iframeContent]);
+  }, [updatedIframeContent]);
 
   let mobileTabs: PlaygroundTab[] = [];
   if (outputs?.includes(PlaygroundOutputs.Video) && displayVideoTile) {
@@ -638,12 +707,19 @@ export default function Playground({
   mobileTabs.push({
     title: "SD",
     content: (
-      <PlaygroundTile
-        className="w-full h-full overflow-y-auto flex"
-        childrenClassName="h-full grow items-start"
-      >
-        {sdContent}
-      </PlaygroundTile>
+      <div className="flex flex-col h-full">
+        <div
+          className="w-full h-1/2 overflow-y-auto flex"
+        >
+          {canvasTileContent}
+        </div>
+        
+        <div
+          className="h-1/2 grow flex"
+        >
+          {sdContent}
+        </div>
+      </div>
     ),
   });
 
