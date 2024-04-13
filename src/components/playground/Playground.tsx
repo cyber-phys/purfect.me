@@ -37,6 +37,18 @@ import { Button } from "../button/Button";
 import { useChat } from "@/components/chat/useChat";
 import ConnectionModal from "./ConnectModal";
 import LoadingScreen from "./LoadingScreen";
+import * as fal from "@fal-ai/serverless-client";
+
+fal.config({
+  proxyUrl: "/api/fal/proxy",
+});
+
+function randomSeed(): number {
+  const multipliers = [2342534, 1235392, 875441, 102321];
+  const multiplier = multipliers[Math.floor(Math.random() * multipliers.length)];
+  return Math.floor(Math.random() * multiplier);
+}
+
 
 type CharacterCard = {
   id: string;
@@ -59,6 +71,10 @@ type CharacterCard = {
   bio: string;
   creation_time: string;
 };
+
+interface FALResult {
+  imageUrl: string;
+}
 
 export enum PlaygroundOutputs {
   Video,
@@ -175,6 +191,7 @@ export default function Playground({
   const [iframeContent, setIframeContent] = useState(htmlString);
   const roomState = useConnectionState();
   const tracks = useTracks();
+  const [imageUrl, setImageUrl] = useState<string>("");
 
   const participants = useRemoteParticipants({
     updateOnlyOn: [RoomEvent.ParticipantMetadataChanged],
@@ -503,6 +520,42 @@ export default function Playground({
     showQR,
   ]);
 
+  fal.config({
+    credentials: "6c1ec85f-b8a9-4910-898d-100b321505a3:7ba16cbaadabd0c6cbc2605205450ec8",
+  });
+   
+  const connection = fal.realtime.connect("fal-ai/lcm", {
+    onResult: (result) => {
+      console.log(result);
+      setImageUrl(() => result.images[0].url);
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+   
+  connection.send({
+    prompt:
+      "an island near sea, with seagulls, moon shining over the sea, light house, boats int he background, fish flying over the sea",
+    sync_mode: true,
+    image_url:
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==",
+  });
+
+  const sdContent = useMemo(() => (
+    <div className="w-full h-full bg-black flex items-center justify-center">
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt="Generated Image"
+          className="max-w-full max-h-full object-contain"
+        />
+      ) : (
+        <div className="text-white">Loading image...</div>
+      )}
+    </div>
+  ), [imageUrl]);
+
   const canvasTileContent = useMemo(() => {
     return (
       <iframe
@@ -578,6 +631,18 @@ export default function Playground({
         childrenClassName="h-full grow items-start"
       >
         {canvasTileContent}
+      </PlaygroundTile>
+    ),
+  });
+
+  mobileTabs.push({
+    title: "SD",
+    content: (
+      <PlaygroundTile
+        className="w-full h-full overflow-y-auto flex"
+        childrenClassName="h-full grow items-start"
+      >
+        {sdContent}
       </PlaygroundTile>
     ),
   });
