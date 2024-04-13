@@ -593,7 +593,7 @@ const updatedIframeContent = useMemo(() => {
         prompt: completePrompt,
         sync_mode: true,
         image_url: canvasImageUrl,
-        strength: 0.2,
+        strength: 0.4,
         num_inference_steps: 2,
       });
     }
