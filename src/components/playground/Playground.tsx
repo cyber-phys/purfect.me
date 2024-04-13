@@ -607,9 +607,9 @@ const updatedIframeContent = useMemo(() => {
     onResult: (result) => {
       setImageUrl(() => result.images[0].url);
     },
-    // onError: (error) => {
-    //   console.error(error);
-    // },
+    onError: (error) => {
+      console.error(error);
+    },
   });
 
   useEffect(() => {
