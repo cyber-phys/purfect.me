@@ -279,6 +279,7 @@ export default function Playground({
         if (decoded.prompt) {
           setSDPrompt(decoded.prompt);
           console.log(decoded.prompt)
+          console.warn(decoded.page)
         }
       }
     },
