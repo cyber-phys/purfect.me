@@ -593,7 +593,7 @@ const updatedIframeContent = useMemo(() => {
         prompt: completePrompt,
         sync_mode: true,
         image_url: canvasImageUrl,
-        strength: 0.4,
+        strength: 0.5,
         num_inference_steps: 2,
       });
     }
@@ -603,7 +603,7 @@ const updatedIframeContent = useMemo(() => {
     credentials: "6c1ec85f-b8a9-4910-898d-100b321505a3:7ba16cbaadabd0c6cbc2605205450ec8",
   });
    
-  const connection = fal.realtime.connect("fal-ai/lcm", {
+  const connection = fal.realtime.connect("fal-ai/fast-turbo-diffusion", {
     onResult: (result) => {
       setImageUrl(() => result.images[0].url);
     },
