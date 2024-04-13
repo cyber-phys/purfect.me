@@ -647,7 +647,7 @@ export default function Playground({
               >
                 {settingsTileContent}
               </PlaygroundTile>
-              {/* {outputs?.includes(PlaygroundOutputs.Video) && (
+              {outputs?.includes(PlaygroundOutputs.Video) && (
             <PlaygroundTile
               title="Video"
               className="w-full h-full grow"
@@ -655,7 +655,7 @@ export default function Playground({
             >
               {videoTileContent}
             </PlaygroundTile>
-          )} */}
+          )}
               {/* {outputs?.includes(PlaygroundOutputs.Audio) && (
             <PlaygroundTile
               title="Audio"
