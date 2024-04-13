@@ -587,14 +587,14 @@ const updatedIframeContent = useMemo(() => {
   };
 
   useEffect(() => {
-    const completePrompt = sdPrompt + "```" + iframeContent + "```"
+    const completePrompt = "A photorealistic image taken on a Cannon 5D Mark ii: " + sdPrompt
     if (roomState === ConnectionState.Connected && canvasImageUrl) {
       connection.send({
         prompt: completePrompt,
         sync_mode: true,
         image_url: canvasImageUrl,
         strength: 0.5,
-        num_inference_steps: 2,
+        num_inference_steps: 4,
       });
     }
   }, [roomState, canvasImageUrl]);
@@ -607,9 +607,9 @@ const updatedIframeContent = useMemo(() => {
     onResult: (result) => {
       setImageUrl(() => result.images[0].url);
     },
-    onError: (error) => {
-      console.error(error);
-    },
+    // onError: (error) => {
+    //   console.error(error);
+    // },
   });
 
   useEffect(() => {
