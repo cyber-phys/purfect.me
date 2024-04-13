@@ -329,7 +329,6 @@ export default function Playground({
     setMessages(allMessages);
   }, [chatMessages, localParticipant, agentParticipant]);
 
-
   const videoTileContent = useMemo(() => {
     const videoFitClassName = `object-${videoFit}`;
     return (
@@ -582,7 +581,7 @@ const updatedIframeContent = useMemo(() => {
     if (roomState === ConnectionState.Connected && canvasImageUrl) {
       connection.send({
         prompt:
-          "an island near sea, with seagulls, moon shining over the sea, light house, boats in the background, fish flying over the sea",
+          "A high resolution animation in the style of south park",
         sync_mode: true,
         image_url: canvasImageUrl,
       });
@@ -612,9 +611,9 @@ const updatedIframeContent = useMemo(() => {
 
   const sdContent = useMemo(() => (
     <div className="w-full h-full bg-black flex items-center justify-center">
-      {canvasImageUrl ? (
+      { imageUrl ? (
         <img
-        src={canvasImageUrl || undefined}
+        src={imageUrl || undefined}
         alt="Generated Image"
           className="max-w-full max-h-full object-contain"
         />
@@ -622,7 +621,7 @@ const updatedIframeContent = useMemo(() => {
         <div className="text-white">Loading image...</div>
       )}
     </div>
-  ), [canvasImageUrl]);
+  ), [imageUrl]);
 
   const canvasTileContent = useMemo(() => {
     return (
