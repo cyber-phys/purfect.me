@@ -190,6 +190,7 @@ export default function Playground({
   const { localParticipant } = useLocalParticipant();
   const characterPromptRef = useRef<HTMLTextAreaElement>(null);
   const [iframeContent, setIframeContent] = useState(htmlString);
+  const [sdPrompt, setSDPrompt] = useState("A high resoultion render of this web page:")
   const roomState = useConnectionState();
   const tracks = useTracks();
   const [imageUrl, setImageUrl] = useState<string>("");
@@ -269,6 +270,14 @@ export default function Playground({
         );
         if (decoded.html) {
           setIframeContent(decoded.html);
+        }
+      }
+      if (msg.topic === "sdprompt") {
+        const decoded = JSON.parse(
+          new TextDecoder("utf-8").decode(msg.payload)
+        );
+        if (decoded.prompt) {
+          setSDPrompt(decoded.prompt);
         }
       }
     },
@@ -522,7 +531,7 @@ export default function Playground({
     showQR,
   ]);
 
-  const captureScript = `
+const captureScript = `
 <script>
   window.addEventListener('message', (event) => {
     if (event.data === 'captureImage') {
@@ -578,10 +587,10 @@ const updatedIframeContent = useMemo(() => {
   };
 
   useEffect(() => {
+    const completePrompt = sdPrompt + "```" + iframeContent + "```"
     if (roomState === ConnectionState.Connected && canvasImageUrl) {
       connection.send({
-        prompt:
-          "A high resolution animation in the style of south park",
+        prompt: completePrompt,
         sync_mode: true,
         image_url: canvasImageUrl,
       });
