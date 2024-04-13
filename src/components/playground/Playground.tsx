@@ -190,7 +190,7 @@ export default function Playground({
   const { localParticipant } = useLocalParticipant();
   const characterPromptRef = useRef<HTMLTextAreaElement>(null);
   const [iframeContent, setIframeContent] = useState(htmlString);
-  const [sdPrompt, setSDPrompt] = useState("A high resoultion render of this web page:")
+  const [sdPrompt, setSDPrompt] = useState("A high resoultion photo taken on a cannon 5D mark ii of a SCI-FI movie, cyberpunk 2077")
   const roomState = useConnectionState();
   const tracks = useTracks();
   const [imageUrl, setImageUrl] = useState<string>("");
@@ -588,7 +588,7 @@ const updatedIframeContent = useMemo(() => {
   };
 
   useEffect(() => {
-    const completePrompt = "A photorealistic image taken on a Cannon 5D Mark ii: " + sdPrompt
+    const completePrompt = sdPrompt + " "+ iframeContent
     if (roomState === ConnectionState.Connected && canvasImageUrl) {
       connection.send({
         prompt: completePrompt,
