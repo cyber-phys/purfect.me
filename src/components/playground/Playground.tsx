@@ -613,7 +613,7 @@ const updatedIframeContent = useMemo(() => {
   });
 
   useEffect(() => {
-    const interval = setInterval(captureIframeAsImage, 100); // Capture every 5 seconds
+    const interval = setInterval(captureIframeAsImage, 300); // Capture every 5 seconds
     return () => {
       clearInterval(interval);
     };
