@@ -50,7 +50,6 @@ function randomSeed(): number {
   return Math.floor(Math.random() * multiplier);
 }
 
-
 type CharacterCard = {
   id: string;
   name: string;
@@ -190,7 +189,7 @@ export default function Playground({
   const { localParticipant } = useLocalParticipant();
   const characterPromptRef = useRef<HTMLTextAreaElement>(null);
   const [iframeContent, setIframeContent] = useState(htmlString);
-  const [sdPrompt, setSDPrompt] = useState("A high resoultion photo taken on a cannon 5D mark ii of a SCI-FI movie, cyberpunk 2077, space ship, space")
+  const [sdPrompt, setSDPrompt] = useState("A high resoultion photo taken on a cannon 5D mark ii")
   const roomState = useConnectionState();
   const tracks = useTracks();
   const [imageUrl, setImageUrl] = useState<string>("");
@@ -232,9 +231,11 @@ export default function Playground({
   const localTracks = tracks.filter(
     ({ participant }) => participant instanceof LocalParticipant
   );
+
   const localVideoTrack = localTracks.find(
     ({ source }) => source === Track.Source.Camera
   );
+
   const localMicTrack = localTracks.find(
     ({ source }) => source === Track.Source.Microphone
   );
@@ -594,14 +595,14 @@ const updatedIframeContent = useMemo(() => {
         prompt: completePrompt,
         sync_mode: true,
         image_url: canvasImageUrl,
-        strength: 0.3,
+        strength: 0.5,
         num_inference_steps: 2,
       });
     }
   }, [roomState, canvasImageUrl]);
 
   fal.config({
-    credentials: "6c1ec85f-b8a9-4910-898d-100b321505a3:7ba16cbaadabd0c6cbc2605205450ec8",
+    credentials: "39a55db4-38a6-4acc-8fc5-247180f220c7:1e58cbb4bbc3c3de9561d88c15a979b0",
   });
    
   const connection = fal.realtime.connect("fal-ai/fast-turbo-diffusion", {
