@@ -605,7 +605,7 @@ const updatedIframeContent = useMemo(() => {
     credentials: "39a55db4-38a6-4acc-8fc5-247180f220c7:1e58cbb4bbc3c3de9561d88c15a979b0",
   });
    
-  const connection = fal.realtime.connect("fal-ai/fast-turbo-diffusion", {
+  const connection = fal.realtime.connect("fal-ai/lcm-sd15-i2i", {
     onResult: (result) => {
       setImageUrl(() => result.images[0].url);
     },
