@@ -190,7 +190,7 @@ export default function Playground({
   const { localParticipant } = useLocalParticipant();
   const characterPromptRef = useRef<HTMLTextAreaElement>(null);
   const [iframeContent, setIframeContent] = useState(htmlString);
-  const [sdPrompt, setSDPrompt] = useState("A high resoultion photo taken on a cannon 5D mark ii of a SCI-FI movie, cyberpunk 2077")
+  const [sdPrompt, setSDPrompt] = useState("A high resoultion photo taken on a cannon 5D mark ii of a SCI-FI movie, cyberpunk 2077, space ship, space")
   const roomState = useConnectionState();
   const tracks = useTracks();
   const [imageUrl, setImageUrl] = useState<string>("");
@@ -546,49 +546,49 @@ const captureScript = `
 </script>
 `;
 
-// const updatedIframeContent = useMemo(() => {
-//   // Ensure html2canvas is available in the iframe
-//   const html2canvasScript = '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>';
-//   // Append the html2canvas script and the capture script to the iframe content
-//   return `${iframeContent}${html2canvasScript}${captureScript}`;
-// }, [iframeContent]);
+const updatedIframeContent = useMemo(() => {
+  // Ensure html2canvas is available in the iframe
+  const html2canvasScript = '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>';
+  // Append the html2canvas script and the capture script to the iframe content
+  return `${iframeContent}${html2canvasScript}${captureScript}`;
+}, [iframeContent]);
 
-  const captureIframeAsImage = async () => {
-    if (iframeRef.current) {
-      console.log("UPDATED IMAGE");
-      const iframe = iframeRef.current;
-      const iframeContent = iframe.contentDocument || iframe.contentWindow?.document;
-      if (iframeContent) {
-        try {
-          const canvas = await html2canvas(iframeContent.body);
-          const dataURL = canvas.toDataURL('image/png');
-          setCanvasImageUrl(dataURL);
-        } catch (error) {
-          console.error('Error capturing iframe image:', error);
-        }
-      }
-    }
-  };
-
-  // const captureIframeAsImage = () => {
+  // const captureIframeAsImage = async () => {
   //   if (iframeRef.current) {
+  //     console.log("UPDATED IMAGE");
   //     const iframe = iframeRef.current;
-  //     const iframeWindow = iframe.contentWindow;
-  
-  //     const handleMessage = (event: MessageEvent) => {
-  //       if (typeof event.data === 'string' && event.data.startsWith('data:image/png;base64,')) {
-  //         setCanvasImageUrl(event.data);
-  //         window.removeEventListener('message', handleMessage);
+  //     const iframeContent = iframe.contentDocument || iframe.contentWindow?.document;
+  //     if (iframeContent) {
+  //       try {
+  //         const canvas = await html2canvas(iframeContent.body);
+  //         const dataURL = canvas.toDataURL('image/png');
+  //         setCanvasImageUrl(dataURL);
+  //       } catch (error) {
+  //         console.error('Error capturing iframe image:', error);
   //       }
-  //     };
-  
-  //     window.addEventListener('message', handleMessage);
-  //     iframeWindow?.postMessage('captureImage', '*');
+  //     }
   //   }
   // };
 
+  const captureIframeAsImage = () => {
+    if (iframeRef.current) {
+      const iframe = iframeRef.current;
+      const iframeWindow = iframe.contentWindow;
+  
+      const handleMessage = (event: MessageEvent) => {
+        if (typeof event.data === 'string' && event.data.startsWith('data:image/png;base64,')) {
+          setCanvasImageUrl(event.data);
+          window.removeEventListener('message', handleMessage);
+        }
+      };
+  
+      window.addEventListener('message', handleMessage);
+      iframeWindow?.postMessage('captureImage', '*');
+    }
+  };
+
   useEffect(() => {
-    const completePrompt = sdPrompt + " "+ iframeContent
+    const completePrompt = sdPrompt
     if (roomState === ConnectionState.Connected && canvasImageUrl) {
       connection.send({
         prompt: completePrompt,
