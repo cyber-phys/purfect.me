@@ -279,8 +279,6 @@ export default function Playground({
         );
         if (decoded.prompt) {
           setSDPrompt(decoded.prompt);
-          console.log(decoded.prompt)
-          console.warn(decoded.page)
         }
       }
     },
@@ -621,6 +619,7 @@ const updatedIframeContent = useMemo(() => {
 
   const sdContent = useMemo(() => (
     <div className="w-full h-full bg-black flex items-center justify-center">
+      <p className="text-white">{sdPrompt}</p>
       { imageUrl ? (
         <img
         src={imageUrl || undefined}
