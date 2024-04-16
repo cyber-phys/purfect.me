@@ -176,6 +176,7 @@ export default function Playground({
   const [imageUrl, setImageUrl] = useState<string>("");
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [canvasImageUrl, setCanvasImageUrl] = useState<string | null>(null);
+  const [createNewFrame, setCreateNewFrame] = useState(true);
 
   const participants = useRemoteParticipants({
     updateOnlyOn: [RoomEvent.ParticipantMetadataChanged],
@@ -584,22 +585,25 @@ const updatedIframeContent = useMemo(() => {
 
   useEffect(() => {
     const completePrompt = sdPrompt
-    if (roomState === ConnectionState.Connected && canvasImageUrl) {
+    if (roomState === ConnectionState.Connected && canvasImageUrl && createNewFrame) {
       connection.send({
         prompt: completePrompt,
         sync_mode: true,
         image_url: canvasImageUrl,
-        strength: 0.5,
+        strength: 0.3,
         num_inference_steps: 2,
+        seed: 42,
       });
+      setCreateNewFrame(false);
     }
-  }, [roomState, canvasImageUrl]);
+  }, [roomState, canvasImageUrl, createNewFrame]);
    
   const connection = fal.realtime.connect("fal-ai/lcm-sd15-i2i", {
     connectionKey: 'canvas-diffusion',
     clientOnly: true,
     onResult: (result) => {
       setImageUrl(() => result.images[0].url);
+      setCreateNewFrame(true);      
     },
     onError: (error) => {
       console.error(error);
@@ -607,7 +611,7 @@ const updatedIframeContent = useMemo(() => {
   });
 
   useEffect(() => {
-    const interval = setInterval(captureIframeAsImage, 300); // Capture every 5 seconds
+    const interval = setInterval(captureIframeAsImage, 100); // Capture every 5 seconds
     return () => {
       clearInterval(interval);
     };
@@ -615,7 +619,6 @@ const updatedIframeContent = useMemo(() => {
 
   const sdContent = useMemo(() => (
     <div className="w-full h-full bg-black flex items-center justify-center">
-      <p className="text-white">{sdPrompt}</p>
       { imageUrl ? (
         <img
         src={imageUrl || undefined}
