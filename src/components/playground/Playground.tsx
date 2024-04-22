@@ -46,6 +46,8 @@ import ConnectionModal from "./ConnectModal";
 import LoadingScreen from "./LoadingScreen";
 import * as fal from "@fal-ai/serverless-client";
 import html2canvas from 'html2canvas';
+import ForceGraph2D from 'react-force-graph-2d';
+
 
 fal.config({
   proxyUrl: "/api/fal/proxy",
@@ -177,6 +179,7 @@ export default function Playground({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [canvasImageUrl, setCanvasImageUrl] = useState<string | null>(null);
   const [createNewFrame, setCreateNewFrame] = useState(true);
+  const [graphData, setGraphData] = useState({ nodes: [], links: [] });
 
   const participants = useRemoteParticipants({
     updateOnlyOn: [RoomEvent.ParticipantMetadataChanged],
@@ -262,36 +265,59 @@ export default function Playground({
         if (decoded.prompt) {
           setSDPrompt(decoded.prompt);
         }
-      } else if (msg.topic === "lk-chat-history-update-topic") {
-        const decoded = JSON.parse(
-          new TextDecoder("utf-8").decode(msg.payload)
-        );
-        const newMessages = decoded.nodes.map((node: any) => ({
-          id: node.id,
-          timestamp: node.timestamp,
-          isSelf: !node.is_assistant,
-          highlight_word_count: node.highlight_word_count,
-          name: node.participant, 
-          message: node.message,
-          parent_id: node.parent_id,
-          alt_ids: node.alt_ids,
-          conversation_id: node.conversation_id,
-          character_id: node.character_id,
-          model: node.model,
-          type: node.type,
+      } else if (msg.topic === "lk-node-tree-update-topic") {
+      const decoded = JSON.parse(
+        new TextDecoder("utf-8").decode(msg.payload)
+      );
+      const newNodes = decoded.nodes.map((node: any) => ({
+        id: node.id,
+        name: node.participant, // Assuming you want to use the participant ID as the name
+        val: 1
+      }));
+      const newLinks = decoded.nodes
+        .filter((node: any) => node.parent_id) // Ensure there is a parent_id to create a link
+        .map((node: any) => ({
+          source: node.parent_id,
+          target: node.id,
         }));
-        console.log(newMessages)
-        updateHistory?.(newMessages)
-      }
-    },
+
+      const graphData = {
+        nodes: newNodes,
+        links: newLinks,
+      };
+
+      console.log(graphData)
+
+      // Assuming you have a state to hold this graph data
+      setGraphData(graphData);
+    } else if (msg.topic === "lk-chat-history-update-topic") {
+      console.log("refesh")
+      const decoded = JSON.parse(
+        new TextDecoder("utf-8").decode(msg.payload)
+      );
+      const newMessages = decoded.nodes.map((node: any) => ({
+        id: node.id,
+        timestamp: node.timestamp,
+        isSelf: !node.is_assistant,
+        highlight_word_count: node.highlight_word_count,
+        name: node.participant, 
+        message: node.message,
+        parent_id: node.parent_id,
+        alt_ids: node.alt_ids,
+        conversation_id: node.conversation_id,
+        character_id: node.character_id,
+        model: node.model,
+        type: node.type,
+      }));
+      console.log(newMessages)
+      updateHistory?.(newMessages)
+    }
+  },
     [updateHistory]
   );
 
   const { send } = useDataChannel(onDataReceived);
 
-<<<<<<< HEAD
-  //TODO: lets get rid of this
-=======
   const handleCommand = useCallback((command: string, arg?: string) => {
     // Prepare the command object
     const commandPayload = {
@@ -323,7 +349,6 @@ export default function Playground({
     }
   }, [send]);
 
->>>>>>> 1bffbe0 (Handels commands and sends them to backend, started working on loom interface)
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleCharacterPromptChange(characterPromptRef.current?.value || "");
@@ -413,6 +438,44 @@ export default function Playground({
       </div>
     );
   }, [agentVideoTrack, videoFit]);
+
+  const graphTileContent = () => {
+    // Assuming `graphData` is your state that holds the nodes and links
+    // and it's updated elsewhere in your component as the data changes
+  
+      
+      const handleClick = (node: any) => {
+        // Example interaction handler - adjust as needed
+
+        handleCommand("alt", node.id);
+        console.log(`Clicked node:`, node);
+      };
+  
+      return (
+        <div className="bg-white">
+        <ForceGraph2D
+          graphData={graphData}
+          onNodeClick={handleClick}
+          // nodeAutoColorBy="group"
+          linkColor='red'
+          linkVisibility={true}
+          linkWidth={10}
+          // linkDirectionalArrowLength={5} // Add this line
+
+          nodeCanvasObject={(node, ctx, globalScale) => {
+            const label = node.id;
+            const fontSize = 12/globalScale;
+            ctx.font = `${fontSize}px Sans-Serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = 'blue'; // Or any color based on the node
+            ctx.fillText(label, node.x, node.y);
+          }}
+        />
+        </div>
+      );
+  
+  };
 
   const audioTileContent = useMemo(() => {
     return (
@@ -869,17 +932,17 @@ const updatedIframeContent = useMemo(() => {
               {audioTileContent}
             </PlaygroundTile>
           )} */}
-                  <PlaygroundTile
-                    className="w-full h-full overflow-y-auto flex"
-                    childrenClassName="h-full grow items-start"
-                  >
-                    {canvasTileContent}
-                  </PlaygroundTile>
-                </div>
-              </>
-            )}
-          </div>
-        </>
+              <PlaygroundTile
+                className="w-full h-full overflow-y-auto flex"
+                childrenClassName="h-full grow items-start"
+              >
+                {graphTileContent()}
+              </PlaygroundTile>
+            </div>
+          </>
+        )}
+      </div>
+</>
       ) : (
         <ConnectionModal
           isOpen={
