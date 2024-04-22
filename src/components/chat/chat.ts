@@ -82,32 +82,45 @@ export function setupChat(room: Room, options?: ChatOptions) {
 
   const finalMessageDecoder = messageDecoder ?? decode;
 
+  const historyUpdateTopic = 'chat_history_update';
+
   /** Build up the message array over time. */
   const messagesObservable = messageSubject.pipe(
     map((msg) => {
-      const parsedMessage = finalMessageDecoder(msg.payload);
-      const newMessage: ReceivedChatMessage = { ...parsedMessage, from: msg.from };
-      return newMessage;
-    }),
-    scan<ReceivedChatMessage, ReceivedChatMessage[]>((acc, value) => {
-      // handle message updates
-      if (
-        'id' in value &&
-        acc.find((msg) => msg.from?.identity === value.from?.identity && msg.id === value.id)
-      ) {
-        const replaceIndex = acc.findIndex((msg) => msg.id === value.id);
-        if (replaceIndex > -1) {
-          const originalMsg = acc[replaceIndex];
-          acc[replaceIndex] = {
-            ...value,
-            timestamp: originalMsg.timestamp,
-            editTimestamp: value.timestamp,
-          };
-        }
-
-        return [...acc];
+      if (msg.topic === historyUpdateTopic) {
+        console.log(msg.payload)
+        const parsedMessages = finalMessageDecoder(msg.payload) as ChatMessage[];
+        return parsedMessages;
+      } else {
+        const parsedMessage = finalMessageDecoder(msg.payload);
+        const newMessage: ReceivedChatMessage = { ...parsedMessage, from: msg.from };
+        return [newMessage];
       }
-      return [...acc, value];
+    }),
+    scan<ReceivedChatMessage[], ReceivedChatMessage[]>((acc, values) => {
+      if (values.length > 1) {
+        // History update
+        return values;
+      } else {
+        const value = values[0];
+        // Handle message updates
+        if (
+          'id' in value &&
+          acc.find((msg) => msg.from?.identity === value.from?.identity && msg.id === value.id)
+        ) {
+          const replaceIndex = acc.findIndex((msg) => msg.id === value.id);
+          if (replaceIndex > -1) {
+            const originalMsg = acc[replaceIndex];
+            acc[replaceIndex] = {
+              ...value,
+              timestamp: originalMsg.timestamp,
+              editTimestamp: value.timestamp,
+            };
+          }
+          return [...acc];
+        }
+        return [...acc, value];
+      }
     }, []),
     takeUntil(onDestroyObservable),
   );
@@ -159,6 +172,24 @@ export function setupChat(room: Room, options?: ChatOptions) {
     }
   };
 
+  const updateHistory = async (messages: ChatMessage[]) => {
+    console.log("updating history")
+    const encodedMsg = finalMessageEncoder(messages);
+    try {
+      await sendMessage(room.localParticipant, encodedMsg, {
+        topic: historyUpdateTopic,
+        reliable: true,
+      });
+      messageSubject.next({
+        payload: encodedMsg,
+        topic: historyUpdateTopic,
+        from: room.localParticipant,
+      });
+    } catch (error) {
+      console.error('Error updating chat history:', error);
+    }
+  };
+
   function destroy() {
     onDestroyObservable.next();
     onDestroyObservable.complete();
@@ -166,5 +197,5 @@ export function setupChat(room: Room, options?: ChatOptions) {
   }
   room.once(RoomEvent.Disconnected, destroy);
 
-  return { messageObservable: messagesObservable, isSendingObservable: isSending$, send, update };
+  return { messageObservable: messagesObservable, isSendingObservable: isSending$, send, update, updateHistory };
 }

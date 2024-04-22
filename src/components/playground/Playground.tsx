@@ -183,7 +183,8 @@ export default function Playground({
   });
   const agentParticipant = participants.find((p) => p.isAgent);
 
-  const { send: sendChat, chatMessages } = useChat();
+  const { send: sendChat, chatMessages, updateHistory: updateHistory } = useChat();
+
   const visualizerState = useMemo(() => {
     if (agentState === "thinking") {
       return "thinking";
@@ -254,17 +255,36 @@ export default function Playground({
         if (decoded.html) {
           setIframeContent(decoded.html);
         }
-      }
-      if (msg.topic === "sdprompt") {
+      } else if (msg.topic === "sdprompt") {
         const decoded = JSON.parse(
           new TextDecoder("utf-8").decode(msg.payload)
         );
         if (decoded.prompt) {
           setSDPrompt(decoded.prompt);
         }
+      } else if (msg.topic === "lk-chat-tree-update-topic") {
+        const decoded = JSON.parse(
+          new TextDecoder("utf-8").decode(msg.payload)
+        );
+        const newMessages = decoded.nodes.map((node: any) => ({
+          id: node.id,
+          timestamp: node.timestamp,
+          isSelf: !node.is_assistant,
+          highlight_word_count: node.highlight_word_count,
+          name: node.participant, 
+          message: node.message,
+          parent_id: node.parent_id,
+          alt_ids: node.alt_ids,
+          conversation_id: node.conversation_id,
+          character_id: node.character_id,
+          model: node.model,
+          type: node.type,
+        }));
+        console.log(newMessages)
+        updateHistory?.(newMessages)
       }
     },
-    []
+    [updateHistory]
   );
 
   const { send } = useDataChannel(onDataReceived);
@@ -284,19 +304,19 @@ export default function Playground({
         // Handle forward command, e.g., navigate forward in messages or perform an action
         console.log(`Forward command received with argument: ${arg}`);
         // Send the command to the backend
-        send(new TextEncoder().encode(JSON.stringify(commandPayload)), { reliable: true });
+        send(new TextEncoder().encode(JSON.stringify(commandPayload)), { reliable: true, topic: "command" });
         break;
       case "rgen":
         // Handle regenerate command or similar action
         console.log("Regenerate command received");
         // Send the command to the backend
-        send(new TextEncoder().encode(JSON.stringify(commandPayload)), { reliable: true });
+        send(new TextEncoder().encode(JSON.stringify(commandPayload)), { reliable: true , topic: "command"});
         break;
       case "alt":
         // Handle alternate command, e.g., switch modes or perform an alternate action
         console.log(`Alternate command received with argument: ${arg}`);
         // Send the command to the backend
-        send(new TextEncoder().encode(JSON.stringify(commandPayload)), { reliable: true });
+        send(new TextEncoder().encode(JSON.stringify(commandPayload)), { reliable: true, topic: "command" });
         break;
       default:
         console.log(`Unknown command: ${command}`);

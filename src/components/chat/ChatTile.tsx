@@ -114,6 +114,8 @@ export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileP
               highlight_word_count={message.highlight_word_count}
               isSelected={index === selectedMessageIndex}
               pos={index}
+              alt_ids={message.alt_ids}
+              id = {message.id}
             />
           ))}
         </div>

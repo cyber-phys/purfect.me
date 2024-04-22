@@ -22,7 +22,9 @@ export const ChatMessage = ({
   isSelf,
   highlight_word_count,
   isSelected,
-  pos
+  pos,
+  alt_ids,
+  id
 }: ChatMessageProps) => {
   const words = message.split(/(\s+)/);
   let highlightedWords = 0;
@@ -81,7 +83,11 @@ export const ChatMessage = ({
               isSelf ? "gray-700" : accentColor + "-800 text-ts-" + accentColor
             } text-xs`}
           >
-            alt [ 0 ] 1 2 3 4 5 6 7 8 9 10
+            alt {alt_ids?.map((alt_id, index) => (
+              <span key={index}>
+                {alt_id === id ? `[ ${index} ]` : ` ${index} `}
+              </span>
+            )) || 'No alternate IDs'}
           </div>
           <div
             className={`text-sm ${
