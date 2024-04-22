@@ -36,10 +36,21 @@ export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileP
     const parts = command.includes(' ') ? command.split(' ') : command.slice(1).split(/\[(\d+)\]/);
     const cmd = parts[0].startsWith('!') ? parts[0].slice(1) : parts[0]; // Remove '!' if present
     const argIndex = parts.length > 1 ? parseInt(parts[1], 10) : undefined;
+    const altPosition = parts.length > 2 ? parseInt(parts[2], 10) : undefined; // Adjust for zero-based index
   
     // Convert the argIndex to the corresponding message ID, if valid
-    const argId = typeof argIndex === 'number' && messages[argIndex] ? messages[argIndex].id : undefined;
-
+    let argId;
+    if (typeof argIndex === 'number' && messages[argIndex]) {
+      if (cmd === "alt" && typeof altPosition === 'number') {
+        // For !alt command with altPosition, use alt_id at specified position if available
+        const altIds = messages[argIndex].alt_ids;
+        argId = altIds && altIds.length > altPosition ? altIds[altPosition] : undefined;
+      } else {
+        // For other commands or if altPosition is not specified, use the main message ID
+        argId = messages[argIndex].id;
+      }
+    }
+  
     switch (cmd) {
       case "help":
         // Handle !help command
@@ -56,7 +67,7 @@ export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileP
         if (onCommand && argId) onCommand("rgen", argId);
         break;
       case "alt":
-        // Handle !alt[n] or !alt n command with onCommand callback, passing the message ID instead of index
+        // Handle !alt[n] [x] command with onCommand callback, passing the alt_id at position x if specified
         console.log(`Handling !alt command with argument ID: ${argId}`);
         if (onCommand && argId) onCommand("alt", argId);
         break;
