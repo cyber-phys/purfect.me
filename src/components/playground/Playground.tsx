@@ -262,7 +262,7 @@ export default function Playground({
         if (decoded.prompt) {
           setSDPrompt(decoded.prompt);
         }
-      } else if (msg.topic === "lk-chat-tree-update-topic") {
+      } else if (msg.topic === "lk-chat-history-update-topic") {
         const decoded = JSON.parse(
           new TextDecoder("utf-8").decode(msg.payload)
         );
