@@ -6,18 +6,25 @@ import { useEffect, useRef, useState } from "react";
 const inputHeight = 48;
 
 export type ChatMessageType = {
+  id: string;
+  timestamp: number;
+  isSelf: boolean;
+  highlight_word_count: number;
   name: string;
   message: string;
-  isSelf: boolean;
-  timestamp: number;
-  highlight_word_count: number;
+  parent_id: string;
+  alt_ids: string[];
+  conversation_id: string;
+  character_id: string;
+  model: string;
+  type: string;
 };
 
 type ChatTileProps = {
   messages: ChatMessageType[];
   accentColor: string;
   onSend?: (message: string) => Promise<ComponentsChatMessage>;
-  onCommand?: (command: string, arg?: number) => void;
+  onCommand?: (command: string, arg?: string) => void;
 };
 
 export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileProps) => {
@@ -25,25 +32,33 @@ export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileP
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleCommand = (command: string) => {
-    const [cmd, arg] = command.slice(1).split(/\[(\d+)\]/);
-    const numArg = arg ? parseInt(arg, 10) : undefined;
+    // Split the command by spaces or by square brackets for backward compatibility
+    const parts = command.includes(' ') ? command.split(' ') : command.slice(1).split(/\[(\d+)\]/);
+    const cmd = parts[0].startsWith('!') ? parts[0].slice(1) : parts[0]; // Remove '!' if present
+    const argIndex = parts.length > 1 ? parseInt(parts[1], 10) : undefined;
   
+    // Convert the argIndex to the corresponding message ID, if valid
+    const argId = typeof argIndex === 'number' && messages[argIndex] ? messages[argIndex].id : undefined;
+
     switch (cmd) {
       case "help":
         // Handle !help command
         console.log("Handling !help command");
         break;
       case "fw":
-        // Handle !fw[n] command
-        console.log(`Handling !fw command with argument: ${numArg}`);
+        // Handle !fw[n] or !fw n command with onCommand callback, passing the message ID instead of index
+        console.log(`Handling !fw command with argument ID: ${argId}`);
+        if (onCommand && argId) onCommand("fw", argId);
         break;
       case "rgen":
-        // Handle !rgen command
-        console.log("Handling !rgen command");
+        // Handle !rgen or !rgen n command with onCommand callback, passing the message ID instead of index
+        console.log(`Handling !rgen command with argument ID: ${argId}`);
+        if (onCommand && argId) onCommand("rgen", argId);
         break;
       case "alt":
-        // Handle !alt[n] command
-        console.log(`Handling !alt command with argument: ${numArg}`);
+        // Handle !alt[n] or !alt n command with onCommand callback, passing the message ID instead of index
+        console.log(`Handling !alt command with argument ID: ${argId}`);
+        if (onCommand && argId) onCommand("alt", argId);
         break;
       default:
         console.log(`Unknown command: ${command}`);
@@ -98,6 +113,7 @@ export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileP
               accentColor={accentColor}
               highlight_word_count={message.highlight_word_count}
               isSelected={index === selectedMessageIndex}
+              pos={index}
             />
           ))}
         </div>

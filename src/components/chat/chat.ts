@@ -13,6 +13,14 @@ export interface ChatMessage {
   message: string;
   is_assistant: boolean;
   highlight_word_count: number;
+  deleted: boolean;
+  participant: string;
+  parent_id: string;
+  alt_ids: string[];
+  conversation_id: string;
+  character_id: string;
+  model: string;
+  type: string;
 }
 
 /** @public */

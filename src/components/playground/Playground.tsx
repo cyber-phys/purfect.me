@@ -269,7 +269,41 @@ export default function Playground({
 
   const { send } = useDataChannel(onDataReceived);
 
+<<<<<<< HEAD
   //TODO: lets get rid of this
+=======
+  const handleCommand = useCallback((command: string, arg?: string) => {
+    // Prepare the command object
+    const commandPayload = {
+      topic: "command",
+      data: { command, arg }
+    };
+
+    switch (command) {
+      case "fw":
+        // Handle forward command, e.g., navigate forward in messages or perform an action
+        console.log(`Forward command received with argument: ${arg}`);
+        // Send the command to the backend
+        send(new TextEncoder().encode(JSON.stringify(commandPayload)), { reliable: true });
+        break;
+      case "rgen":
+        // Handle regenerate command or similar action
+        console.log("Regenerate command received");
+        // Send the command to the backend
+        send(new TextEncoder().encode(JSON.stringify(commandPayload)), { reliable: true });
+        break;
+      case "alt":
+        // Handle alternate command, e.g., switch modes or perform an alternate action
+        console.log(`Alternate command received with argument: ${arg}`);
+        // Send the command to the backend
+        send(new TextEncoder().encode(JSON.stringify(commandPayload)), { reliable: true });
+        break;
+      default:
+        console.log(`Unknown command: ${command}`);
+    }
+  }, [send]);
+
+>>>>>>> 1bffbe0 (Handels commands and sends them to backend, started working on loom interface)
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleCharacterPromptChange(characterPromptRef.current?.value || "");
@@ -324,11 +358,18 @@ export default function Playground({
         }
       }
       allMessages.push({
-        name,
-        message: msg.message,
+        id: msg.id,
         timestamp: msg?.timestamp,
         isSelf: isSelf,
         highlight_word_count: msg.highlight_word_count,
+        name,
+        message: msg.message,
+        parent_id: msg.parent_id,
+        alt_ids: msg.alt_ids,
+        conversation_id: msg.conversation_id,
+        character_id: msg.character_id,
+        model: msg.model,
+        type: msg.type
       });
     }
     setMessages(allMessages);
@@ -384,6 +425,7 @@ export default function Playground({
         messages={messages}
         accentColor={themeColor}
         onSend={sendChat}
+        onCommand={handleCommand}
       />
     );
   }, [messages, themeColor, sendChat]);
