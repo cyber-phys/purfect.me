@@ -53,8 +53,11 @@ const decoder = new TextDecoder();
 const topicSubjectMap: Map<Room, Map<string, Subject<RawMessage>>> = new Map();
 
 const encode = (message: ChatMessage) => encoder.encode(JSON.stringify(message));
+const encodeArray = (messages: ChatMessage[]): Uint8Array => encoder.encode(JSON.stringify(messages));
 
 const decode = (message: Uint8Array) => JSON.parse(decoder.decode(message)) as ReceivedChatMessage;
+const decodeArray = (message: Uint8Array): ChatMessage[] => JSON.parse(decoder.decode(message)) as ChatMessage[];
+
 
 export function setupChat(room: Room, options?: ChatOptions) {
   const onDestroyObservable = new Subject<void>();
@@ -89,7 +92,7 @@ export function setupChat(room: Room, options?: ChatOptions) {
     map((msg) => {
       if (msg.topic === historyUpdateTopic) {
         console.log(msg.payload)
-        const parsedMessages = finalMessageDecoder(msg.payload) as ChatMessage[];
+        const parsedMessages = decodeArray(msg.payload);
         return parsedMessages;
       } else {
         const parsedMessage = finalMessageDecoder(msg.payload);
@@ -132,8 +135,21 @@ export function setupChat(room: Room, options?: ChatOptions) {
   const send = async (message: string) => {
     const timestamp = Date.now();
     const id = crypto.randomUUID();
-    const chatMessage: ChatMessage = { id, message, timestamp, is_assistant: false, highlight_word_count: 0};
-    const encodedMsg = finalMessageEncoder(chatMessage);
+    const chatMessage: ChatMessage = {
+      id,
+      message,
+      timestamp,
+      is_assistant: false,
+      highlight_word_count: 0,
+      deleted: false, // Assuming default value
+      participant: 'participant_id', // Replace with actual participant ID
+      parent_id: '', // Adjust as necessary
+      alt_ids: [id], // Adjust as necessary
+      conversation_id: 'conversation_id', // Replace with actual conversation ID
+      character_id: 'character_id', // Replace with actual character ID
+      model: 'model_name', // Replace with actual model name
+      type: 'message_type' // Replace with actual message type
+    };    const encodedMsg = finalMessageEncoder(chatMessage);
     isSending$.next(true);
     try {
       await sendMessage(room.localParticipant, encodedMsg, {
@@ -153,7 +169,21 @@ export function setupChat(room: Room, options?: ChatOptions) {
 
   const update = async (message: string, messageId: string) => {
     const timestamp = Date.now();
-    const chatMessage: ChatMessage = { id: messageId, message, timestamp, is_assistant: false, highlight_word_count: 0};
+    const chatMessage: ChatMessage = {
+      id: messageId,
+      message,
+      timestamp,
+      is_assistant: false,
+      highlight_word_count: 0,
+      deleted: false, // Assuming false as a placeholder
+      participant: 'participant_id', // Replace 'participant_id' with actual participant ID
+      parent_id: '', // Assuming no parent, adjust as necessary
+      alt_ids: [messageId],
+      conversation_id: 'conversation_id', // Replace 'conversation_id' with actual conversation ID
+      character_id: 'character_id', // Replace 'character_id' with actual character ID
+      model: 'model_name', // Replace 'model_name' with actual model name
+      type: 'message_type' // Replace 'message_type' with actual message type
+    };
     const encodedMsg = finalMessageEncoder(chatMessage);
     isSending$.next(true);
     try {
@@ -174,7 +204,7 @@ export function setupChat(room: Room, options?: ChatOptions) {
 
   const updateHistory = async (messages: ChatMessage[]) => {
     console.log("updating history")
-    const encodedMsg = finalMessageEncoder(messages);
+    const encodedMsg = encodeArray(messages);
     try {
       await sendMessage(room.localParticipant, encodedMsg, {
         topic: historyUpdateTopic,

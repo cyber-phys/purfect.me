@@ -127,6 +127,11 @@ export const ChatTile = ({ messages, accentColor, onSend, onCommand }: ChatTileP
               pos={index}
               alt_ids={message.alt_ids}
               id = {message.id}
+              parent_id={message.parent_id}
+              conversation_id={message.conversation_id}
+              character_id={message.character_id}
+              model={message.model}
+              type={message.type}
             />
           ))}
         </div>
