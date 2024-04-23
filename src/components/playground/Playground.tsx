@@ -379,11 +379,10 @@ export default function Playground({
   // Send Character Chard when Agent connects
   useEffect(() => {
     if (agentParticipant && characterCard) {
-      const characterCardData = JSON.stringify({
-        topic: "character_card",
-        character: characterCard,
+      const characterCardData = JSON.stringify({ 
+        character: characterCard 
       });
-      send(new TextEncoder().encode(characterCardData), { reliable: true });
+      send(new TextEncoder().encode(characterCardData), { reliable: true, topic: "character_card", });
     }
   }, [agentParticipant]);
 
