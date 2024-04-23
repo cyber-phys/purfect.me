@@ -46,8 +46,10 @@ import ConnectionModal from "./ConnectModal";
 import LoadingScreen from "./LoadingScreen";
 import * as fal from "@fal-ai/serverless-client";
 import html2canvas from 'html2canvas';
-import ForceGraph2D from 'react-force-graph-2d';
-
+import dynamic from 'next/dynamic';
+const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
+  ssr: false,
+});
 
 fal.config({
   proxyUrl: "/api/fal/proxy",
@@ -272,7 +274,9 @@ export default function Playground({
       const newNodes = decoded.nodes.map((node: any) => ({
         id: node.id,
         name: node.participant, // Assuming you want to use the participant ID as the name
-        val: 1
+        type: node.is_assistant,
+        val: 1,
+        messages: node.message
       }));
       const newLinks = decoded.nodes
         .filter((node: any) => node.parent_id) // Ensure there is a parent_id to create a link
@@ -439,41 +443,40 @@ export default function Playground({
   }, [agentVideoTrack, videoFit]);
 
   const graphTileContent = () => {
-    // Assuming `graphData` is your state that holds the nodes and links
-    // and it's updated elsewhere in your component as the data changes
+    // Check if graphData has nodes
+    const hasData = graphData.nodes && graphData.nodes.length > 0;
   
-      
-      const handleClick = (node: any) => {
-        // Example interaction handler - adjust as needed
-
-        handleCommand("alt", node.id);
-        console.log(`Clicked node:`, node);
-      };
+    const handleClick = (node: any) => {
+      // Example interaction handler - adjust as needed
+      handleCommand("alt", node.id);
+      console.log(`Clicked node:`, node);
+    };
   
-      return (
-        <div className="bg-white">
-        <ForceGraph2D
-          graphData={graphData}
-          onNodeClick={handleClick}
-          // nodeAutoColorBy="group"
-          linkColor='red'
-          linkVisibility={true}
-          linkWidth={10}
-          // linkDirectionalArrowLength={5} // Add this line
-
-          nodeCanvasObject={(node, ctx, globalScale) => {
-            const label = node.id;
-            const fontSize = 12/globalScale;
-            ctx.font = `${fontSize}px Sans-Serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillStyle = 'blue'; // Or any color based on the node
-            ctx.fillText(label, node.x, node.y);
-          }}
-        />
-        </div>
-      );
-  
+    return (
+      <div className="bg-white">
+        {hasData ? (
+          <ForceGraph2D
+            graphData={graphData}
+            onNodeClick={handleClick}
+            linkVisibility={true}
+            linkWidth={5}
+            linkDirectionalArrowLength={5}
+            nodeCanvasObject={(node, ctx, globalScale) => {
+              const label = node.id;
+              const fontSize = 12/globalScale;
+              ctx.font = `${fontSize}px Sans-Serif`;
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillStyle = node.type ? 'blue' : 'red'; // Adjust the condition based on your data structure
+              ctx.fillText(label, node.x, node.y);
+            }}
+            nodeLabel={(node) => node.messages} // Adjust according to your data structure
+          />
+        ) : (
+          <div>Loading graph data...</div> // Placeholder for empty or loading state
+        )}
+      </div>
+    );
   };
 
   const audioTileContent = useMemo(() => {
@@ -869,51 +872,51 @@ const updatedIframeContent = useMemo(() => {
 
   return (
     <>
-      {roomState === ConnectionState.Connected ? (
-        <>
-          <PlaygroundHeader
-            title={title}
-            logo={logo}
-            githubLink={githubLink}
-            height={headerHeight}
-            accentColor={themeColor}
-            connectionState={roomState}
-            onConnectClicked={() =>
-              onConnect(
-                roomState === (ConnectionState.Disconnected as ConnectionState),
-              )
-            }
-          />
-          <div
-            className={`flex gap-4 py-4 grow w-full selection:bg-${themeColor}-900`}
-            style={{ height: `calc(100% - ${headerHeight}px)` }}
-          >
-            {["offline", "starting"].includes(agentState) ? (
-              <LoadingScreen />
-            ) : (
-              <>
-                <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
-                  <PlaygroundTabbedTile
-                    className="h-full"
-                    tabs={mobileTabs}
-                    initialTab={mobileTabs.length - 1}
-                  />
-                </div>
-                {outputs?.includes(PlaygroundOutputs.Chat) && (
-                  <PlaygroundTile className="h-full grow basis-3/4 hidden lg:flex">
-                    {chatTileContent}
-                  </PlaygroundTile>
-                )}
-                <div className="flex-col grow basis-1/4 gap-4 h-full hidden lg:flex">
-                  <PlaygroundTile
-                    padding={false}
-                    backgroundColor="gray-950"
-                    className="w-full h-1/2 grow"
-                    childrenClassName="justify-center"
-                  >
-                    {settingsTileContent}
-                  </PlaygroundTile>
-                  {/* {outputs?.includes(PlaygroundOutputs.Video) && (
+          {roomState === ConnectionState.Connected ? (
+<>
+      <PlaygroundHeader
+        title={title}
+        logo={logo}
+        githubLink={githubLink}
+        height={headerHeight}
+        accentColor={themeColor}
+        connectionState={roomState}
+        onConnectClicked={() =>
+          onConnect(roomState === ConnectionState.Disconnected as ConnectionState)
+        }
+      />
+      <div
+        className={`flex gap-4 py-4 grow w-full selection:bg-${themeColor}-900`}
+        style={{ height: `calc(100% - ${headerHeight}px)` }}
+      >
+        {['offline', 'starting'].includes(agentState) ? ( 
+          <LoadingScreen/>
+          ):(
+          <>
+            <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
+              <PlaygroundTabbedTile
+                className="h-full"
+                tabs={mobileTabs}
+                initialTab={mobileTabs.length - 1}
+              />
+            </div>
+            {outputs?.includes(PlaygroundOutputs.Chat) && (
+              <PlaygroundTile
+                className="h-full grow basis-3/4 hidden lg:flex"
+              >
+                {chatTileContent}
+              </PlaygroundTile>
+            )}
+            <div className="flex-col grow basis-1/4 gap-4 h-full hidden lg:flex w-1/2">
+              <PlaygroundTile
+                padding={false}
+                backgroundColor="gray-950"
+                className="w-full h-1/4 grow"
+                childrenClassName="justify-center"
+              >
+                {settingsTileContent}
+              </PlaygroundTile>
+              {/* {outputs?.includes(PlaygroundOutputs.Video) && (
             <PlaygroundTile
               title="Video"
               className="w-full h-full grow"
@@ -922,7 +925,7 @@ const updatedIframeContent = useMemo(() => {
               {videoTileContent}
             </PlaygroundTile>
           )} */}
-                  {/* {outputs?.includes(PlaygroundOutputs.Audio) && (
+              {/* {outputs?.includes(PlaygroundOutputs.Audio) && (
             <PlaygroundTile
               title="Audio"
               className="w-full h-1/2 grow"
