@@ -90,6 +90,23 @@ export interface PlaygroundProps {
   characterId: string;
 }
 
+interface ChunkNode {
+  id: string;
+  // Add other properties of chunkNodes here
+}
+
+interface TreeChunks {
+  [treeId: string]: {
+    [chunkNumber: number]: ChunkNode[];
+  };
+}
+
+interface GraphDataState {
+  nodes: any[]; // Replace 'any' with a more specific type if possible
+  links: any[]; // Replace 'any' with a more specific type if possible
+  receivedChunks: TreeChunks;
+}
+
 const headerHeight = 56;
 const displayAudioTile = false;
 const displayVideoTile = false;
@@ -181,7 +198,11 @@ export default function Playground({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [canvasImageUrl, setCanvasImageUrl] = useState<string | null>(null);
   const [createNewFrame, setCreateNewFrame] = useState(true);
-  const [graphData, setGraphData] = useState({ nodes: [], links: [] });
+  const [graphData, setGraphData] = useState<GraphDataState>({
+    nodes: [],
+    links: [],
+    receivedChunks: {},
+  });
 
   const participants = useRemoteParticipants({
     updateOnlyOn: [RoomEvent.ParticipantMetadataChanged],
@@ -268,33 +289,51 @@ export default function Playground({
           setSDPrompt(decoded.prompt);
         }
       } else if (msg.topic === "lk-node-tree-update-topic") {
-      const decoded = JSON.parse(
-        new TextDecoder("utf-8").decode(msg.payload)
-      );
-      const newNodes = decoded.nodes.map((node: any) => ({
-        id: node.id,
-        name: node.participant, // Assuming you want to use the participant ID as the name
-        type: node.is_assistant,
-        val: 1,
-        messages: node.message
-      }));
-      const newLinks = decoded.nodes
-        .filter((node: any) => node.parent_id) // Ensure there is a parent_id to create a link
-        .map((node: any) => ({
-          source: node.parent_id,
-          target: node.id,
-        }));
-
-      const graphData = {
-        nodes: newNodes,
-        links: newLinks,
-      };
-
-      console.log(graphData)
-
-      // Assuming you have a state to hold this graph data
-      setGraphData(graphData);
-    } else if (msg.topic === "lk-chat-history-update-topic") {
+        const decoded = JSON.parse(new TextDecoder("utf-8").decode(msg.payload));
+        const { nodes: chunkNodes, chunk, total_chunks, tree_id } = decoded;
+      
+        // Update the state to store the received chunk
+        setGraphData((prevGraphData) => {
+          const updatedReceivedChunks: TreeChunks = {
+            ...prevGraphData.receivedChunks,
+            [tree_id]: {
+              ...prevGraphData.receivedChunks[tree_id],
+              [chunk]: chunkNodes,
+            },
+          };
+      
+          const receivedChunksForTree = updatedReceivedChunks[tree_id];
+          if (Object.keys(receivedChunksForTree).length === total_chunks) {
+            // All chunks received, combine them into a single array
+            const allNodes = Object.values(receivedChunksForTree).flat();
+      
+            const newNodes = allNodes.map((node: any) => ({
+              id: node.id,
+              name: node.participant,
+              type: node.is_assistant,
+              val: 1,
+              messages: node.message,
+            }));
+      
+            const newLinks = allNodes
+              .filter((node: any) => node.parent_id)
+              .map((node: any) => ({
+                source: node.parent_id,
+                target: node.id,
+              }));
+      
+            // Return the updated graph data with the complete set of nodes and links
+            return {
+              nodes: newNodes,
+              links: newLinks,
+              receivedChunks: updatedReceivedChunks,
+            };
+          } else {
+            // Not all chunks received yet, just update the receivedChunks part of the state
+            return { ...prevGraphData, receivedChunks: updatedReceivedChunks };
+          }
+        });
+      } else if (msg.topic === "lk-chat-history-update-topic") {
       console.log("refesh")
       const decoded = JSON.parse(
         new TextDecoder("utf-8").decode(msg.payload)
