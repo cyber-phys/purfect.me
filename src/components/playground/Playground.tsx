@@ -462,13 +462,13 @@ export default function Playground({
             linkWidth={5}
             linkDirectionalArrowLength={5}
             nodeCanvasObject={(node, ctx, globalScale) => {
-              const label = node.id;
+              const label = String(node.id);
               const fontSize = 12/globalScale;
               ctx.font = `${fontSize}px Sans-Serif`;
               ctx.textAlign = 'center';
               ctx.textBaseline = 'middle';
-              ctx.fillStyle = node.type ? 'blue' : 'red'; // Adjust the condition based on your data structure
-              ctx.fillText(label, node.x, node.y);
+              ctx.fillStyle = node.type ? 'blue' : 'red';
+              ctx.fillText(label, node.x || 0, node.y || 0);
             }}
             nodeLabel={(node) => node.messages} // Adjust according to your data structure
           />
