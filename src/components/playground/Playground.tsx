@@ -47,15 +47,18 @@ import LoadingScreen from "./LoadingScreen";
 import * as fal from "@fal-ai/serverless-client";
 import html2canvas from 'html2canvas';
 import dynamic from 'next/dynamic';
-import { ForceGraph3D } from 'react-force-graph';
 import { CSS2DRenderer, CSS2DObject } from 'three-stdlib';
 import * as d3 from 'd3-force';
 
-// const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
+// const ForceGraph2D = dynamic(() => import('react-force-graph'), {
 //   ssr: false,
 // });
 
-import { ForceGraph2D } from 'react-force-graph';
+const ForceGraph2D = dynamic(() => import('react-force-graph').then(mod => ({ default: mod.ForceGraph2D })), {
+  ssr: false,
+});
+
+// import { ForceGraph2D } from 'react-force-graph';
 import { ForceGraphMethods } from 'react-force-graph-2d';
 
 fal.config({
@@ -609,8 +612,10 @@ export default function Playground({
               const end = link.target;
               // Draw the link line
               ctx.beginPath();
-              ctx.moveTo(start.x, start.y);
-              ctx.lineTo(end.x, end.y);
+              if (start && typeof start === 'object' && end && typeof end === 'object') {
+                ctx.moveTo(start.x || 0, start.y || 0);
+                ctx.lineTo(end.x || 0, end.y || 0);
+              }
               ctx.strokeStyle = '#DA70D6'; // Custom link color
               ctx.stroke();
             }}
@@ -625,16 +630,16 @@ export default function Playground({
               const words = text.split(' ');
               let line = '';
               let lines = [];
-              let y = node.y - maxBoxHeight / 2 + fontSize;
+              let y = (node.y || 0) - maxBoxHeight / 2 + fontSize;
   
               // Set fill style for background color of the text box
               ctx.fillStyle = node.type ? '#8A2BE2' : '#4B0082';
               // Draw the background rectangle with a border
-              ctx.fillRect(node.x - maxBoxWidth / 2, node.y - maxBoxHeight / 2, maxBoxWidth, maxBoxHeight);
+              ctx.fillRect((node.x || 0) - maxBoxWidth / 2, (node.y || 0) - maxBoxHeight / 2, maxBoxWidth, maxBoxHeight);
               // Set stroke style for border and draw the border
               ctx.strokeStyle = '#DA70D6'; // Border color
               ctx.lineWidth = 2; // Border width
-              ctx.strokeRect(node.x - maxBoxWidth / 2, node.y - maxBoxHeight / 2, maxBoxWidth, maxBoxHeight);
+              ctx.strokeRect((node.x || 0) - maxBoxWidth / 2, (node.y || 0) - maxBoxHeight / 2, maxBoxWidth, maxBoxHeight);
   
               ctx.fillStyle = 'white';
               ctx.textAlign = 'center';
@@ -654,8 +659,8 @@ export default function Playground({
   
               lines.push(line);
   
-              for (let i = 0; i < lines.length && y + fontSize <= node.y + maxBoxHeight / 2; i++) {
-                ctx.fillText(lines[i], node.x, y);
+              for (let i = 0; i < lines.length && y + fontSize <= (node.y || 0) + maxBoxHeight / 2; i++) {
+                ctx.fillText(lines[i], (node.x || 0), y);
                 y += fontSize;
               }
   
