@@ -14,12 +14,12 @@ const RetroCard = ({ character }: { character: Character }) => {
   };
 
   return (
-    <div className="retro-card" onClick={handleCardClick}>
-      {/* <img src={character.image} alt={character.name} className="retro-card-image" /> */}
-      <div className="retro-card-content">
-        <h3 className="retro-card-title">{character.name}</h3>
-        <p className="retro-card-description">{character.bio}</p>
-        <button className="retro-card-button">Chat Now</button>
+    <div className="card" onClick={handleCardClick} key={character.id}>
+      <div className="card-content">
+        <img src={character.image || "/purfectme.png"} alt={character.name} />
+        <h2>{character.name}</h2>
+        <p>{character.bio}</p>
+        <button className="search-btn">Chat Now</button>
       </div>
     </div>
   );
@@ -59,6 +59,58 @@ export default function Page() {
     router.push("/create");
   };
 
+  // return (
+  //   <>
+  //     <Head>
+  //       <title>Purfect Me</title>
+  //       <meta name="description" content="Quantum multiverse link to your desired reality" />
+  //       <link rel="icon" href="/favicon.ico" />
+  //     </Head>
+  //     <div className="flex">
+
+  //       <div className="bg-purfect-stone-600 text-black font-mono min-h-screen flex flex-col">
+  //         <header className="bg-purfect-stone-600 p-5 text-center">
+  //           <h1 className="text-2xl font-bold">Purfect Me</h1>
+  //         </header>
+  //         <main className="flex-grow">
+  //           <div className="">
+  //             <div className="flex justify-start items-center mb-0 border-5 border-purfect-lime-300 bg-purfect-lime-300 rounded-r-lg w-1/2">
+  //               <button onClick={handleCreateNewCharacter} className="bg-amber-500 py-2 px-4 rounded font-mono text-base">
+  //                 Create New Character
+  //               </button>
+  //             </div>
+  //             <div className="flex justify-start items-center mb-5 border-5 border-purfect-lime-300 bg-purfect-lime-300 rounded-r-lg w-3/4">
+  //               <input
+  //                 type="text"
+  //                 placeholder="Search characters..."
+  //                 value={searchQuery}
+  //                 onChange={(e) => setSearchQuery(e.target.value)}
+  //                 className="w-full p-2 border-2 border-indigo-800 rounded font-mono text-base"
+  //               />
+  //             </div>
+  //           </div>
+  //           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+  //             {filteredCharacters.map((character) => (
+  //               <RetroCard key={character.id} character={character} />
+  //             ))}
+  //           </div>
+  //           <div className="mt-10">
+  //             <h2 className="text-xl font-bold">About Purfect Me</h2>
+  //             <p className="text-base leading-relaxed">
+  //               Purfect Me is a chatbot role-playing site that allows you to engage in immersive conversations with a variety of characters. Explore different personalities and embark on exciting adventures in a quantum multiverse.
+  //             </p>
+  //           </div>
+  //         </main>
+  //         <footer className="bg-pink-400 p-5 text-center">
+  //           <p className="text-sm">&copy; {new Date().getFullYear()} Purfect Me. All rights reserved.</p>
+  //         </footer>
+  //       </div>
+  //       <PlayerBar />
+
+  //     </div>
+  //   </>
+  // );
+
   return (
     <>
       <Head>
@@ -79,17 +131,18 @@ export default function Page() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <header>
-        <h1><i className="fa-solid fa-shapes"></i> Y2K Character Cards</h1>
-        <form>
-          <input type="search" placeholder="Search characters..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-          <button type="submit" className="search-btn"><i className="fa-solid fa-search"></i></button>
-        </form>
+        <h1><i className="fa-solid fa-shapes"></i>Purfect Me</h1>
       </header>
 
       <main>
         <div className="intro">
-          <p>Welcome to the wild and wacky world of Y2K Character Cards! Meet our cast of quirky AI characters, each one more charmingly eccentric than the last. Click a card to start chatting and embark on a zany adventure into the unknown!</p>
+        <p>Purfect Me is a chatbot role-playing site that allows you to engage in immersive conversations with a variety of characters. Explore different personalities and embark on exciting adventures in a quantum multiverse.</p>
         </div>
+
+        <form>
+          <input type="search" placeholder="Search characters..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+          <button type="submit" className="search-btn"><i className="fa-solid fa-search"></i></button>
+        </form>
 
         <div className="create-character">
           <a href="https://character.ai/character_creator">
@@ -98,18 +151,11 @@ export default function Page() {
         </div>
 
         <div className="character-grid">
-          {characters.map((character) => (
-            <div className="card" key={character.id}>
-              <div className="card-content">
-                <img src={character.image} alt={character.name} />
-                <h2>{character.name}</h2>
-                <p>{character.bio}</p>
-                <a href={`https://character.ai/chat?char=${character.name}`}>Chat Now</a>
-              </div>
-            </div>
+          {filteredCharacters.map((character) => (
+            <RetroCard key={character.id} character={character} />
           ))}
         </div>
-      </main>
+      </main >
     </>
   );
 }

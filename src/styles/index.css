@@ -72,6 +72,18 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.1),
                 inset 0 2px 5px rgba(0,0,0,0.1);
   }
+
+  form {
+    display: flex;
+    max-width: 250px;
+    align-items: center;
+    background-color: white;
+    padding: 5px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1),
+                inset 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 25px;
+  }
   
   input[type="search"] {
     border: none;
@@ -225,4 +237,17 @@
   .create-character a:hover {
     box-shadow: 0 5px 20px rgba(0,0,0,0.2);
     transform: translateY(-5px);
+  }
+
+  @media (min-width: 768px) {
+    .character-grid {
+      place-items: center; /* Centers the card in the grid */
+    }
+  
+    .card {
+      max-width: 480px; /* Adjust based on your design preference */
+      height: auto; /* Ensures the card scales with the content */
+      aspect-ratio: 1 / 1.2; /* Adjust the aspect ratio as needed */
+      padding-top: 0; /* Remove the padding-top aspect ratio hack for larger screens */
+    }
   }
