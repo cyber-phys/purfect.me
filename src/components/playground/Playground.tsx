@@ -47,9 +47,16 @@ import LoadingScreen from "./LoadingScreen";
 import * as fal from "@fal-ai/serverless-client";
 import html2canvas from 'html2canvas';
 import dynamic from 'next/dynamic';
-const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
-  ssr: false,
-});
+import { ForceGraph3D } from 'react-force-graph';
+import { CSS2DRenderer, CSS2DObject } from 'three-stdlib';
+import * as d3 from 'd3-force';
+
+// const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
+//   ssr: false,
+// });
+
+import { ForceGraph2D } from 'react-force-graph';
+import { ForceGraphMethods } from 'react-force-graph-2d';
 
 fal.config({
   proxyUrl: "/api/fal/proxy",
@@ -185,6 +192,7 @@ export default function Playground({
   setroom,
   characterId,
 }: PlaygroundProps) {
+  const fgRef = useRef<ForceGraphMethods<any, any> | undefined>(undefined);
   const [agentState, setAgentState] = useState<AgentState>("offline");
   const [themeColor, setThemeColor] = useState(defaultColor);
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
@@ -210,6 +218,7 @@ export default function Playground({
   const agentParticipant = participants.find((p) => p.isAgent);
 
   const { send: sendChat, chatMessages, updateHistory: updateHistory } = useChat();
+
 
   const visualizerState = useMemo(() => {
     if (agentState === "thinking") {
@@ -481,42 +490,239 @@ export default function Playground({
     );
   }, [agentVideoTrack, videoFit]);
 
+  // const graphTileContent = () => {
+  //   const hasData = graphData.nodes && graphData.nodes.length > 0;
+  
+  //   const handleClick = (node: any) => {
+  //     handleCommand("alt", node.id);
+  //     console.log(`Clicked node:`, node);
+  //   };
+  
+  //   return (
+  //     <div className="dag-container">
+  //       {hasData ? (
+  //         <ForceGraph2D
+  //           graphData={graphData}
+  //           onNodeClick={handleClick}
+  //           linkVisibility={true}
+  //           linkWidth={5}
+  //           linkDirectionalArrowLength={5}
+  //           nodeCanvasObject={(node, ctx, globalScale) => {
+  //             const maxBoxWidth = 100; // Maximum box width
+  //             const maxBoxHeight = 50; // Maximum box height
+  //             const fontSize = 12 / globalScale;
+  //             ctx.font = `${fontSize}px Sans-Serif`;
+  //             const text = String(node.messages);
+  //             const words = text.split(' ');
+  //             let line = '';
+  //             let lines = [];
+  //             let y = node.y - maxBoxHeight / 2 + fontSize;
+  
+  //             ctx.fillStyle = node.type ? 'blue' : 'red';
+  //             ctx.fillRect(node.x - maxBoxWidth / 2, node.y - maxBoxHeight / 2, maxBoxWidth, maxBoxHeight);
+  
+  //             ctx.fillStyle = 'white';
+  //             ctx.textAlign = 'center';
+  //             ctx.textBaseline = 'top';
+  
+  //             words.forEach((word) => {
+  //               const testLine = line + word + ' ';
+  //               const metrics = ctx.measureText(testLine);
+  //               const testWidth = metrics.width;
+  //               if (testWidth > maxBoxWidth && line !== '') {
+  //                 lines.push(line);
+  //                 line = word + ' ';
+  //               } else {
+  //                 line = testLine;
+  //               }
+  //             });
+  
+  //             lines.push(line);
+  
+  //             // Clipping text to fit within the box, without actual scrolling
+  //             for (let i = 0; i < lines.length && y + fontSize <= node.y + maxBoxHeight / 2; i++) {
+  //               ctx.fillText(lines[i], node.x, y);
+  //               y += fontSize;
+  //             }
+  
+  //             // Optionally, indicate more text is available (e.g., with "...")
+  //             if (y + fontSize > node.y + maxBoxHeight / 2) {
+  //               const ellipsis = '...';
+  //               ctx.fillText(ellipsis, node.x, node.y + maxBoxHeight / 2 - fontSize);
+  //             }
+  //           }}
+  //           nodeLabel={(node) => node.messages}
+  //         />
+  //       ) : (
+  //         <div>Loading graph data...</div>
+  //       )}
+  //     </div>
+  //   );
+  // };
+
+  useEffect(() => {
+    if (!fgRef.current) return; // Guard clause if ref is not set yet
+
+    const fg = fgRef.current;
+
+    // Deactivate existing forces
+    fg.d3Force('center', d3.forceCenter(10));
+    // fg.d3Force('charge', null);
+
+    // Add collision and bounding box forces
+    fg.d3Force('collide', d3.forceCollide(2));
+    fg.d3Force('box', () => {
+      const SQUARE_HALF_SIDE = 1 * 2;
+
+      graphData.nodes.forEach(node => {
+        const x = node.x || 0, y = node.y || 0;
+
+        // bounce on box walls
+        if (Math.abs(x) > SQUARE_HALF_SIDE) { node.vx *= -1; }
+        if (Math.abs(y) > SQUARE_HALF_SIDE) { node.vy *= -1; }
+      });
+    });
+
+  }, [graphData.nodes]); // Add dependencies here if necessary
+
   const graphTileContent = () => {
-    // Check if graphData has nodes
+
     const hasData = graphData.nodes && graphData.nodes.length > 0;
   
     const handleClick = (node: any) => {
-      // Example interaction handler - adjust as needed
       handleCommand("alt", node.id);
       console.log(`Clicked node:`, node);
     };
+
+
   
     return (
-      <div className="bg-white">
+      <div className="dag-container">
         {hasData ? (
           <ForceGraph2D
             graphData={graphData}
             onNodeClick={handleClick}
             linkVisibility={true}
             linkWidth={5}
-            linkDirectionalArrowLength={5}
-            nodeCanvasObject={(node, ctx, globalScale) => {
-              const label = String(node.id);
-              const fontSize = 12/globalScale;
-              ctx.font = `${fontSize}px Sans-Serif`;
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-              ctx.fillStyle = node.type ? 'blue' : 'red';
-              ctx.fillText(label, node.x || 0, node.y || 0);
+            linkCanvasObject={(link, ctx, globalScale) => {
+              const start = link.source;
+              const end = link.target;
+              // Draw the link line
+              ctx.beginPath();
+              ctx.moveTo(start.x, start.y);
+              ctx.lineTo(end.x, end.y);
+              ctx.strokeStyle = '#DA70D6'; // Custom link color
+              ctx.stroke();
             }}
-            nodeLabel={(node) => node.messages} // Adjust according to your data structure
+            linkDirectionalArrowLength={5}
+            nodeRelSize={25}
+            nodeCanvasObject={(node, ctx, globalScale) => {
+              const maxBoxWidth = 100; // Maximum box width
+              const maxBoxHeight = 50; // Maximum box height
+              const fontSize = 12 / globalScale;
+              ctx.font = `${fontSize}px Sans-Serif`;
+              const text = String(node.messages);
+              const words = text.split(' ');
+              let line = '';
+              let lines = [];
+              let y = node.y - maxBoxHeight / 2 + fontSize;
+  
+              // Set fill style for background color of the text box
+              ctx.fillStyle = node.type ? '#8A2BE2' : '#4B0082';
+              // Draw the background rectangle with a border
+              ctx.fillRect(node.x - maxBoxWidth / 2, node.y - maxBoxHeight / 2, maxBoxWidth, maxBoxHeight);
+              // Set stroke style for border and draw the border
+              ctx.strokeStyle = '#DA70D6'; // Border color
+              ctx.lineWidth = 2; // Border width
+              ctx.strokeRect(node.x - maxBoxWidth / 2, node.y - maxBoxHeight / 2, maxBoxWidth, maxBoxHeight);
+  
+              ctx.fillStyle = 'white';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'top';
+  
+              words.forEach((word) => {
+                const testLine = line + word + ' ';
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+                if (testWidth > maxBoxWidth && line !== '') {
+                  lines.push(line);
+                  line = word + ' ';
+                } else {
+                  line = testLine;
+                }
+              });
+  
+              lines.push(line);
+  
+              for (let i = 0; i < lines.length && y + fontSize <= node.y + maxBoxHeight / 2; i++) {
+                ctx.fillText(lines[i], node.x, y);
+                y += fontSize;
+              }
+  
+              if (y + fontSize > (node.y || 0) + maxBoxHeight / 2) {
+                const ellipsis = '...';
+                ctx.fillText(ellipsis, node.x || 0, (node.y || 0) + maxBoxHeight / 2 - fontSize);
+              }
+            }}
+            nodeLabel={(node) => node.messages}
+            // d3Force="charge" // Use the charge force for repulsion
+            // d3ReheatSimulation={true} // Reheat the simulation on data change
+            // d3AlphaDecay={0.0002} // Adjust simulation cooling rate
+            // d3VelocityDecay={0.0002} // Adjust nodes' movement inertia
+            // d3ForceConfig={{
+            //   charge: { strength: -1200000 }, // Negative value for repulsion
+            //   collision: { radius: 100 }, // Collision detection with specified radius
+            //   link: { distance: 100000000, strength: 1000000 }, // Minimum link distance
+            // }}
+            cooldownTime={Infinity}
+            d3AlphaDecay={0.2}
+            d3VelocityDecay={0.2}
+            ref={fgRef}
           />
         ) : (
-          <div>Loading graph data...</div> // Placeholder for empty or loading state
+          <div>Loading graph data...</div>
         )}
       </div>
     );
   };
+
+  // const graphTileContent = () => {
+  //   // Check if graphData has nodes
+  //   const hasData = graphData.nodes && graphData.nodes.length > 0;
+  
+  //   const handleClick = (node: any) => {
+  //     // Example interaction handler - adjust as needed
+  //     handleCommand("alt", node.id);
+  //     console.log(`Clicked node:`, node);
+  //   };
+  
+  //   return (
+  //     <div className="dag-container">
+  //       {hasData ? (
+  //         <ForceGraph2D
+  //           graphData={graphData}
+  //           onNodeClick={handleClick}
+  //           linkVisibility={true}
+  //           linkWidth={5}
+  //           linkDirectionalArrowLength={5}
+  //           nodeCanvasObject={(node, ctx, globalScale) => {
+  //             const label = String(node.id);
+  //             const msg = String(node.messages)
+  //             const fontSize = 12/globalScale;
+  //             ctx.font = `${fontSize}px Sans-Serif`;
+  //             ctx.textAlign = 'center';
+  //             ctx.textBaseline = 'middle';
+  //             ctx.fillStyle = node.type ? 'blue' : 'red';
+  //             ctx.fillText(msg, node.x || 0, node.y || 0);
+  //           }}
+  //           nodeLabel={(node) => node.messages} // Adjust according to your data structure
+  //         />
+  //       ) : (
+  //         <div>Loading graph data...</div> // Placeholder for empty or loading state
+  //       )}
+  //     </div>
+  //   );
+  // };
 
   const audioTileContent = useMemo(() => {
     return (

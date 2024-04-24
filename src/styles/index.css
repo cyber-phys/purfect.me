@@ -24,7 +24,8 @@
     color: var(--text);
     margin: 0;
     padding: 0;
-  }
+    min-height: calc(100vh + 500px); /* Adjust the 100px as needed to cover overscroll */
+}
   
   @keyframes gradient {
     0% {
@@ -92,6 +93,7 @@
     outline: none;
     padding: 5px;
     width: 200px;
+    color: black;
   }
   
   .pm-index-search-btn {
@@ -177,6 +179,10 @@
   .card p {
     color: var(--text);
     font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 10px;
+    max-height: 100px; /* Adjust the max-height as needed */
+    overflow-y: auto;
   }
   
   .card a {

@@ -25,7 +25,9 @@
     "qrcode.react": "^3.1.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-force-graph": "^1.44.3",
     "react-force-graph-2d": "^1.25.4",
+    "three-stdlib": "^2.29.6",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
@@ -38,6 +40,7 @@
     "@types/node": "^20.10.4",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18",
+    "@types/three": "^0.163.0",
     "@types/uuid": "^9.0.8",
     "autoprefixer": "^10.4.16",
     "eslint": "^8",

@@ -275,9 +275,25 @@ export default function App() {
         );
     };
 
+    useEffect(() => {
+        // Add the class to the body tag
+        document.body.classList.add('pm-index-body');
+        document.body.classList.add('full-background-page');
+    
+    
+        // Cleanup function to remove the class when the component unmounts
+        return () => {
+          document.body.classList.remove('pm-index-body');
+          document.body.classList.remove('full-background-page');
+    
+        };
+      }, []);
+
     return (
-        <div className="flex justify-center items-center h-screen dark text-foreground bg-background p-2">
-            <div className="flex-col border border-violet-400 p-4 rounded w-full max-w-[400px] h-full overflow-hidden">
+        // <div className="flex justify-center items-center h-screen dark text-foreground bg-background p-2">
+        <div className="flex text-black justify-center"> 
+            {/* <div className="flex-col border border-violet-400 p-4 rounded w-full max-w-[400px] h-full overflow-hidden"> */}
+            <div className="creator-container">
                 <h1 className="text-violet-200">Create a new character</h1>
                 <ScrollShadow hideScrollBar className="w-full h-full overflow-auto flex flex-col items-center">
                     <div className="py-2">
@@ -347,6 +363,7 @@ export default function App() {
                             value={selectedVoice}
                             onChange={(e) => setSelectedVoice(e.target.value)}
                             className="w-full"
+                            color="default"
                         >
                             {voices.map((voice) => (
                                 <SelectItem key={voice.id} value={voice.id}>

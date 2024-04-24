@@ -16,7 +16,8 @@ const RetroCard = ({ character }: { character: Character }) => {
   return (
     <div className="card" onClick={handleCardClick} key={character.id}>
       <div className="card-content">
-        <img src={character.image || "/purfectme.png"} alt={character.name} />
+        {/* <img src={character.image || "/purfectme.png"} alt={character.name} /> */}
+        <img src={"/purfectme.png"} alt={character.name} />
         <h2>{character.name}</h2>
         <p>{character.bio}</p>
         <button className="pm-index-search-btn">Chat Now</button>
@@ -37,10 +38,14 @@ export default function Page() {
   useEffect(() => {
     // Add the class to the body tag
     document.body.classList.add('pm-index-body');
+    document.body.classList.add('full-background-page');
+
 
     // Cleanup function to remove the class when the component unmounts
     return () => {
       document.body.classList.remove('pm-index-body');
+      document.body.classList.remove('full-background-page');
+
     };
   }, []);
 
@@ -69,58 +74,6 @@ export default function Page() {
     router.push("/create");
   };
 
-  // return (
-  //   <>
-  //     <Head>
-  //       <title>Purfect Me</title>
-  //       <meta name="description" content="Quantum multiverse link to your desired reality" />
-  //       <link rel="icon" href="/favicon.ico" />
-  //     </Head>
-  //     <div className="flex">
-
-  //       <div className="bg-purfect-stone-600 text-black font-mono min-h-screen flex flex-col">
-  //         <header className="bg-purfect-stone-600 p-5 text-center">
-  //           <h1 className="text-2xl font-bold">Purfect Me</h1>
-  //         </header>
-  //         <main className="flex-grow">
-  //           <div className="">
-  //             <div className="flex justify-start items-center mb-0 border-5 border-purfect-lime-300 bg-purfect-lime-300 rounded-r-lg w-1/2">
-  //               <button onClick={handleCreateNewCharacter} className="bg-amber-500 py-2 px-4 rounded font-mono text-base">
-  //                 Create New Character
-  //               </button>
-  //             </div>
-  //             <div className="flex justify-start items-center mb-5 border-5 border-purfect-lime-300 bg-purfect-lime-300 rounded-r-lg w-3/4">
-  //               <input
-  //                 type="text"
-  //                 placeholder="Search characters..."
-  //                 value={searchQuery}
-  //                 onChange={(e) => setSearchQuery(e.target.value)}
-  //                 className="w-full p-2 border-2 border-indigo-800 rounded font-mono text-base"
-  //               />
-  //             </div>
-  //           </div>
-  //           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-  //             {filteredCharacters.map((character) => (
-  //               <RetroCard key={character.id} character={character} />
-  //             ))}
-  //           </div>
-  //           <div className="mt-10">
-  //             <h2 className="text-xl font-bold">About Purfect Me</h2>
-  //             <p className="text-base leading-relaxed">
-  //               Purfect Me is a chatbot role-playing site that allows you to engage in immersive conversations with a variety of characters. Explore different personalities and embark on exciting adventures in a quantum multiverse.
-  //             </p>
-  //           </div>
-  //         </main>
-  //         <footer className="bg-pink-400 p-5 text-center">
-  //           <p className="text-sm">&copy; {new Date().getFullYear()} Purfect Me. All rights reserved.</p>
-  //         </footer>
-  //       </div>
-  //       <PlayerBar />
-
-  //     </div>
-  //   </>
-  // );
-
   return (
     <>
       <Head>
@@ -145,17 +98,18 @@ export default function Page() {
       </header>
 
       <main>
+        <div className="p-4">
         <div className="pm-index-intro">
         <p>Purfect Me is a chatbot role-playing site that allows you to engage in immersive conversations with a variety of characters. Explore different personalities and embark on exciting adventures in a quantum multiverse.</p>
         </div>
-
+        
         <form className="pm-index-form">
           <input type="search" className="pm-index-search-input" placeholder="Search characters..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           <button type="submit" className="pm-index-search-btn"><i className="fa-solid fa-search"></i></button>
         </form>
 
-        <div className="create-character">
-          <a href="https://character.ai/character_creator">
+        <div className="create-character" onClick={handleCreateNewCharacter}>
+          <a>
             <i className="fa-solid fa-wand-magic-sparkles"></i> Conjure Your Own Character
           </a>
         </div>
@@ -164,6 +118,7 @@ export default function Page() {
           {filteredCharacters.map((character) => (
             <RetroCard key={character.id} character={character} />
           ))}
+        </div>
         </div>
       </main >
     </>
