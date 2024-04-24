@@ -19,7 +19,7 @@ const RetroCard = ({ character }: { character: Character }) => {
         <img src={character.image || "/purfectme.png"} alt={character.name} />
         <h2>{character.name}</h2>
         <p>{character.bio}</p>
-        <button className="search-btn">Chat Now</button>
+        <button className="pm-index-search-btn">Chat Now</button>
       </div>
     </div>
   );
@@ -33,6 +33,16 @@ export default function Page() {
   const filteredCharacters = characters.filter((character: Character) =>
     character.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  useEffect(() => {
+    // Add the class to the body tag
+    document.body.classList.add('pm-index-body');
+
+    // Cleanup function to remove the class when the component unmounts
+    return () => {
+      document.body.classList.remove('pm-index-body');
+    };
+  }, []);
 
   useEffect(() => {
     async function fetchCharacters() {
@@ -130,18 +140,18 @@ export default function Page() {
         <meta property="og:image:height" content="630" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <header>
-        <h1><i className="fa-solid fa-shapes"></i>Purfect Me</h1>
+      <header className="pm-index-header">
+        <h1 className="pm-index-h1"><i className="fa-solid fa-shapes"></i>Purfect Me</h1>
       </header>
 
       <main>
-        <div className="intro">
+        <div className="pm-index-intro">
         <p>Purfect Me is a chatbot role-playing site that allows you to engage in immersive conversations with a variety of characters. Explore different personalities and embark on exciting adventures in a quantum multiverse.</p>
         </div>
 
-        <form>
-          <input type="search" placeholder="Search characters..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-          <button type="submit" className="search-btn"><i className="fa-solid fa-search"></i></button>
+        <form className="pm-index-form">
+          <input type="search" className="pm-index-search-input" placeholder="Search characters..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+          <button type="submit" className="pm-index-search-btn"><i className="fa-solid fa-search"></i></button>
         </form>
 
         <div className="create-character">

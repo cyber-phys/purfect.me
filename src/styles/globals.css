@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+/* body {
   background: black;
-}
+} */
 
 #__next {
   width: 100%;
