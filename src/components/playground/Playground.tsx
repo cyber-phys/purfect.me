@@ -569,7 +569,7 @@ export default function Playground({
     const fg = fgRef.current;
 
     // Deactivate existing forces
-    fg.d3Force('center', d3.forceCenter(10));
+    fg.d3Force('center', d3.forceCenter());
     // fg.d3Force('charge', null);
 
     // Add collision and bounding box forces
@@ -586,7 +586,7 @@ export default function Playground({
       });
     });
 
-  }, [graphData.nodes]); // Add dependencies here if necessary
+  }, [fgRef, graphData.nodes]); 
 
   const graphTileContent = () => {
 
