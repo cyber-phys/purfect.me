@@ -78,48 +78,38 @@ export default function Page() {
         <meta property="og:image:height" content="630" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="retro-container">
-        <header className="retro-header">
-          <h1 className="retro-title">Purfect Me</h1>
-        </header>
-        <main className="retro-main">
-          <div className="retro-main-header">
-            <h2 className="retro-subtitle">Explore Characters</h2>
-            <button
-              onClick={handleCreateNewCharacter}
-              className="retro-button retro-button-create"
-            >
-              Create New Character
-            </button>
-          </div>
-          <input
-            type="text"
-            placeholder="Search characters..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="retro-input"
-          />
-          <div className="retro-card-grid">
-            {filteredCharacters.map((character) => (
-              <RetroCard key={character.id} character={character} />
-            ))}
-          </div>
-          <div className="retro-about">
-            <h2 className="retro-subtitle">About Purfect Me</h2>
-            <p className="retro-text">
-              Purfect Me is a chatbot role-playing site that allows you to
-              engage in immersive conversations with a variety of characters.
-              Explore different personalities and embark on exciting adventures
-              in a quantum multiverse.
-            </p>
-          </div>
-        </main>
-        <footer className="retro-footer">
-          <p className="retro-footer-text">
-            &copy; {new Date().getFullYear()} Purfect Me. All rights reserved.
-          </p>
-        </footer>
-      </div>
+      <header>
+        <h1><i className="fa-solid fa-shapes"></i> Y2K Character Cards</h1>
+        <form>
+          <input type="search" placeholder="Search characters..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+          <button type="submit" className="search-btn"><i className="fa-solid fa-search"></i></button>
+        </form>
+      </header>
+
+      <main>
+        <div className="intro">
+          <p>Welcome to the wild and wacky world of Y2K Character Cards! Meet our cast of quirky AI characters, each one more charmingly eccentric than the last. Click a card to start chatting and embark on a zany adventure into the unknown!</p>
+        </div>
+
+        <div className="create-character">
+          <a href="https://character.ai/character_creator">
+            <i className="fa-solid fa-wand-magic-sparkles"></i> Conjure Your Own Character
+          </a>
+        </div>
+
+        <div className="character-grid">
+          {characters.map((character) => (
+            <div className="card" key={character.id}>
+              <div className="card-content">
+                <img src={character.image} alt={character.name} />
+                <h2>{character.name}</h2>
+                <p>{character.bio}</p>
+                <a href={`https://character.ai/chat?char=${character.name}`}>Chat Now</a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
     </>
   );
 }

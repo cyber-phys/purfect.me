@@ -1,4 +1,5 @@
-import "@/styles/globals.css";
+// import "@/styles/globals.css";
+import "@/styles/index.css"
 import type { AppProps } from "next/app";
 import {NextUIProvider} from "@nextui-org/react";
 import {useRouter} from 'next/router';
