@@ -493,100 +493,30 @@ export default function Playground({
     );
   }, [agentVideoTrack, videoFit]);
 
-  // const graphTileContent = () => {
-  //   const hasData = graphData.nodes && graphData.nodes.length > 0;
-  
-  //   const handleClick = (node: any) => {
-  //     handleCommand("alt", node.id);
-  //     console.log(`Clicked node:`, node);
-  //   };
-  
-  //   return (
-  //     <div className="dag-container">
-  //       {hasData ? (
-  //         <ForceGraph2D
-  //           graphData={graphData}
-  //           onNodeClick={handleClick}
-  //           linkVisibility={true}
-  //           linkWidth={5}
-  //           linkDirectionalArrowLength={5}
-  //           nodeCanvasObject={(node, ctx, globalScale) => {
-  //             const maxBoxWidth = 100; // Maximum box width
-  //             const maxBoxHeight = 50; // Maximum box height
-  //             const fontSize = 12 / globalScale;
-  //             ctx.font = `${fontSize}px Sans-Serif`;
-  //             const text = String(node.messages);
-  //             const words = text.split(' ');
-  //             let line = '';
-  //             let lines = [];
-  //             let y = node.y - maxBoxHeight / 2 + fontSize;
-  
-  //             ctx.fillStyle = node.type ? 'blue' : 'red';
-  //             ctx.fillRect(node.x - maxBoxWidth / 2, node.y - maxBoxHeight / 2, maxBoxWidth, maxBoxHeight);
-  
-  //             ctx.fillStyle = 'white';
-  //             ctx.textAlign = 'center';
-  //             ctx.textBaseline = 'top';
-  
-  //             words.forEach((word) => {
-  //               const testLine = line + word + ' ';
-  //               const metrics = ctx.measureText(testLine);
-  //               const testWidth = metrics.width;
-  //               if (testWidth > maxBoxWidth && line !== '') {
-  //                 lines.push(line);
-  //                 line = word + ' ';
-  //               } else {
-  //                 line = testLine;
-  //               }
-  //             });
-  
-  //             lines.push(line);
-  
-  //             // Clipping text to fit within the box, without actual scrolling
-  //             for (let i = 0; i < lines.length && y + fontSize <= node.y + maxBoxHeight / 2; i++) {
-  //               ctx.fillText(lines[i], node.x, y);
-  //               y += fontSize;
-  //             }
-  
-  //             // Optionally, indicate more text is available (e.g., with "...")
-  //             if (y + fontSize > node.y + maxBoxHeight / 2) {
-  //               const ellipsis = '...';
-  //               ctx.fillText(ellipsis, node.x, node.y + maxBoxHeight / 2 - fontSize);
-  //             }
-  //           }}
-  //           nodeLabel={(node) => node.messages}
-  //         />
-  //       ) : (
-  //         <div>Loading graph data...</div>
-  //       )}
-  //     </div>
-  //   );
-  // };
+  // useEffect(() => {
+  //   if (!fgRef.current) return; // Guard clause if ref is not set yet
 
-  useEffect(() => {
-    if (!fgRef.current) return; // Guard clause if ref is not set yet
+  //   const fg = fgRef.current;
 
-    const fg = fgRef.current;
+  //   // Deactivate existing forces
+  //   fg.d3Force('center', d3.forceCenter());
+  //   // fg.d3Force('charge', null);
 
-    // Deactivate existing forces
-    fg.d3Force('center', d3.forceCenter());
-    // fg.d3Force('charge', null);
+  //   // Add collision and bounding box forces
+  //   fg.d3Force('collide', d3.forceCollide(2));
+  //   fg.d3Force('box', () => {
+  //     const SQUARE_HALF_SIDE = 1 * 2;
 
-    // Add collision and bounding box forces
-    fg.d3Force('collide', d3.forceCollide(2));
-    fg.d3Force('box', () => {
-      const SQUARE_HALF_SIDE = 1 * 2;
+  //     graphData.nodes.forEach(node => {
+  //       const x = node.x || 0, y = node.y || 0;
 
-      graphData.nodes.forEach(node => {
-        const x = node.x || 0, y = node.y || 0;
+  //       // bounce on box walls
+  //       if (Math.abs(x) > SQUARE_HALF_SIDE) { node.vx *= -1; }
+  //       if (Math.abs(y) > SQUARE_HALF_SIDE) { node.vy *= -1; }
+  //     });
+  //   });
 
-        // bounce on box walls
-        if (Math.abs(x) > SQUARE_HALF_SIDE) { node.vx *= -1; }
-        if (Math.abs(y) > SQUARE_HALF_SIDE) { node.vy *= -1; }
-      });
-    });
-
-  }, [fgRef, graphData.nodes]); 
+  // }, [fgRef, graphData.nodes]); 
 
   const graphTileContent = () => {
 
