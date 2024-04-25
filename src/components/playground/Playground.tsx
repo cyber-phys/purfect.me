@@ -44,7 +44,7 @@ import { Button } from "../button/Button";
 import { useChat } from "@/components/chat/useChat";
 import ConnectionModal from "./ConnectModal";
 import LoadingScreen from "./LoadingScreen";
-import * as fal from "@fal-ai/serverless-client";
+// import * as fal from "@fal-ai/serverless-client";
 import html2canvas from 'html2canvas';
 import dynamic from 'next/dynamic';
 import { CSS2DRenderer, CSS2DObject } from 'three-stdlib';
@@ -61,9 +61,9 @@ const ForceGraph2D = dynamic(() => import('react-force-graph').then(mod => ({ de
 // import { ForceGraph2D } from 'react-force-graph';
 import { ForceGraphMethods } from 'react-force-graph-2d';
 
-fal.config({
-  proxyUrl: "/api/fal/proxy",
-});
+// fal.config({
+//   proxyUrl: "/api/fal/proxy",
+// });
 
 function randomSeed(): number {
   const multipliers = [2342534, 1235392, 875441, 102321];
@@ -207,8 +207,8 @@ export default function Playground({
   const tracks = useTracks();
   const [imageUrl, setImageUrl] = useState<string>("");
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [canvasImageUrl, setCanvasImageUrl] = useState<string | null>(null);
-  const [createNewFrame, setCreateNewFrame] = useState(true);
+  // const [canvasImageUrl, setCanvasImageUrl] = useState<string | null>(null);
+  // const [createNewFrame, setCreateNewFrame] = useState(true);
   const [graphData, setGraphData] = useState<GraphDataState>({
     nodes: [],
     links: [],
@@ -925,32 +925,32 @@ export default function Playground({
   //   }
   // };
 
-  useEffect(() => {
-    const completePrompt = sdPrompt
-    if (roomState === ConnectionState.Connected && canvasImageUrl && createNewFrame) {
-      connection.send({
-        prompt: completePrompt,
-        sync_mode: true,
-        image_url: canvasImageUrl,
-        strength: 0.3,
-        num_inference_steps: 2,
-        seed: 42,
-      });
-      setCreateNewFrame(false);
-    }
-  }, [roomState, canvasImageUrl, createNewFrame]);
+  // useEffect(() => {
+  //   const completePrompt = sdPrompt
+  //   if (roomState === ConnectionState.Connected && canvasImageUrl && createNewFrame) {
+  //     connection.send({
+  //       prompt: completePrompt,
+  //       sync_mode: true,
+  //       image_url: canvasImageUrl,
+  //       strength: 0.3,
+  //       num_inference_steps: 2,
+  //       seed: 42,
+  //     });
+  //     setCreateNewFrame(false);
+  //   }
+  // }, [roomState, canvasImageUrl, createNewFrame]);
    
-  const connection = fal.realtime.connect("fal-ai/lcm-sd15-i2i", {
-    connectionKey: 'canvas-diffusion',
-    clientOnly: true,
-    onResult: (result) => {
-      setImageUrl(() => result.images[0].url);
-      setCreateNewFrame(true);      
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
+  // const connection = fal.realtime.connect("fal-ai/lcm-sd15-i2i", {
+  //   connectionKey: 'canvas-diffusion',
+  //   clientOnly: true,
+  //   onResult: (result) => {
+  //     setImageUrl(() => result.images[0].url);
+  //     setCreateNewFrame(true);      
+  //   },
+  //   onError: (error) => {
+  //     console.error(error);
+  //   },
+  // });
 
   // useEffect(() => {
   //   const interval = setInterval(captureIframeAsImage, 100); // Capture every 5 seconds
