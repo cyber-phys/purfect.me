@@ -286,7 +286,7 @@ export default function Playground({
 
   const onDataReceived = useCallback(
     (msg: any) => {
-      if (msg.topic === "background") {
+      if (msg.topic === "lk-canvas-update-topic") {
         const decoded = JSON.parse(
           new TextDecoder("utf-8").decode(msg.payload)
         );
