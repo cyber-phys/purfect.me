@@ -300,7 +300,7 @@ export default function Playground({
         if (decoded.prompt) {
           setSDPrompt(decoded.prompt);
         }
-      } else if (msg.topic === "lk-node-tree-update-topic") {
+      } else if (msg.topic === "lk-node-tree-init-topic") {
         const decoded = JSON.parse(new TextDecoder("utf-8").decode(msg.payload));
         const { nodes: chunkNodes, chunk, total_chunks, tree_id } = decoded;
       
@@ -344,6 +344,39 @@ export default function Playground({
             // Not all chunks received yet, just update the receivedChunks part of the state
             return { ...prevGraphData, receivedChunks: updatedReceivedChunks };
           }
+        });
+      } else if (msg.topic === "lk-node-tree-update-topic") {
+        const decoded = JSON.parse(new TextDecoder("utf-8").decode(msg.payload));
+        const newNode = decoded;
+
+        setGraphData((prevGraphData) => {
+          // Create a new node object from the received ChatNode
+          const addedNode = {
+            id: newNode.id,
+            name: newNode.participant,
+            type: newNode.is_assistant,
+            val: 1,
+            messages: newNode.message,
+          };
+
+          // Determine if there's a link to be created (if the new node has a parent_id)
+          const newLink = newNode.parent_id ? {
+            source: newNode.parent_id,
+            target: newNode.id,
+          } : null;
+
+          // Append the new node to the existing nodes array
+          const updatedNodes = [...prevGraphData.nodes, addedNode];
+
+          // Append the new link to the existing links array, if it exists
+          const updatedLinks = newLink ? [...prevGraphData.links, newLink] : [...prevGraphData.links];
+
+          // Return the updated graph data with the new node and possibly a new link
+          return {
+            ...prevGraphData,
+            nodes: updatedNodes,
+            links: updatedLinks,
+          };
         });
       } else if (msg.topic === "lk-chat-history-update-topic") {
       console.log("refesh")
