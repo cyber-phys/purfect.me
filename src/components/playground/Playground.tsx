@@ -291,6 +291,8 @@ export default function Playground({
           new TextDecoder("utf-8").decode(msg.payload)
         );
         if (decoded.html) {
+          console.log("got html")
+          console.log(decoded.html)
           setIframeContent(decoded.html);
         }
       } else if (msg.topic === "sdprompt") {
@@ -869,25 +871,25 @@ export default function Playground({
     showQR,
   ]);
 
-const captureScript = `
-<script>
-  window.addEventListener('message', (event) => {
-    if (event.data === 'captureImage') {
-      html2canvas(document.body).then((canvas) => {
-        const dataURL = canvas.toDataURL('image/png');
-        window.parent.postMessage(dataURL, '*');
-      }).catch((error) => console.error('Error capturing image:', error));
-    }
-  }, false);
-</script>
-`;
+// const captureScript = `
+// <script>
+//   window.addEventListener('message', (event) => {
+//     if (event.data === 'captureImage') {
+//       html2canvas(document.body).then((canvas) => {
+//         const dataURL = canvas.toDataURL('image/png');
+//         window.parent.postMessage(dataURL, '*');
+//       }).catch((error) => console.error('Error capturing image:', error));
+//     }
+//   }, false);
+// </script>
+// `;
 
-const updatedIframeContent = useMemo(() => {
-  // Ensure html2canvas is available in the iframe
-  const html2canvasScript = '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>';
-  // Append the html2canvas script and the capture script to the iframe content
-  return `${iframeContent}${html2canvasScript}${captureScript}`;
-}, [iframeContent]);
+// const updatedIframeContent = useMemo(() => {
+//   // Ensure html2canvas is available in the iframe
+//   const html2canvasScript = '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>';
+//   // Append the html2canvas script and the capture script to the iframe content
+//   return `${iframeContent}${html2canvasScript}${captureScript}`;
+// }, [iframeContent]);
 
   // const captureIframeAsImage = async () => {
   //   if (iframeRef.current) {
@@ -906,22 +908,22 @@ const updatedIframeContent = useMemo(() => {
   //   }
   // };
 
-  const captureIframeAsImage = () => {
-    if (iframeRef.current) {
-      const iframe = iframeRef.current;
-      const iframeWindow = iframe.contentWindow;
+  // const captureIframeAsImage = () => {
+  //   if (iframeRef.current) {
+  //     const iframe = iframeRef.current;
+  //     const iframeWindow = iframe.contentWindow;
   
-      const handleMessage = (event: MessageEvent) => {
-        if (typeof event.data === 'string' && event.data.startsWith('data:image/png;base64,')) {
-          setCanvasImageUrl(event.data);
-          window.removeEventListener('message', handleMessage);
-        }
-      };
+  //     const handleMessage = (event: MessageEvent) => {
+  //       if (typeof event.data === 'string' && event.data.startsWith('data:image/png;base64,')) {
+  //         setCanvasImageUrl(event.data);
+  //         window.removeEventListener('message', handleMessage);
+  //       }
+  //     };
   
-      window.addEventListener('message', handleMessage);
-      iframeWindow?.postMessage('captureImage', '*');
-    }
-  };
+  //     window.addEventListener('message', handleMessage);
+  //     iframeWindow?.postMessage('captureImage', '*');
+  //   }
+  // };
 
   useEffect(() => {
     const completePrompt = sdPrompt
@@ -950,12 +952,12 @@ const updatedIframeContent = useMemo(() => {
     },
   });
 
-  useEffect(() => {
-    const interval = setInterval(captureIframeAsImage, 100); // Capture every 5 seconds
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(captureIframeAsImage, 100); // Capture every 5 seconds
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, []);
 
   const sdContent = useMemo(() => (
     <div className="w-full h-full bg-black flex items-center justify-center">
@@ -975,7 +977,7 @@ const updatedIframeContent = useMemo(() => {
     return (
       <iframe
         ref={iframeRef}
-        srcDoc={updatedIframeContent}
+        srcDoc={iframeContent}
         title="Background"
         sandbox="allow-scripts allow-same-origin"
         frameBorder="0"
@@ -987,7 +989,7 @@ const updatedIframeContent = useMemo(() => {
         }}
       />
     );
-  }, [updatedIframeContent]);
+  }, [iframeContent]);
 
   let mobileTabs: PlaygroundTab[] = [];
   if (outputs?.includes(PlaygroundOutputs.Video) && displayVideoTile) {
