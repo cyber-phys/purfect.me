@@ -7,4 +7,5 @@ interface CloudflareEnv {
     CHARACTERS_KV: KVNamespace
     AVATARS_R2: R2Bucket
     CHARACTERS_DB: D1Database
+    VOICE_DB: D1Database
   }
