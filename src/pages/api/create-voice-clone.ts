@@ -26,7 +26,7 @@ export default async function handler(req: NextRequest) {
 
         if (voiceFile) {
             // Define the API endpoint
-            const apiEndpoint = 'https://freiza-1.taildd8a6.ts.net:6969/start-training-base64';
+            const apiEndpoint = 'http://freiza-1.taildd8a6.ts.net:6969/start-training-base64';
 
             // Prepare the request body
             const requestBody = {
