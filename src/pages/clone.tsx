@@ -52,7 +52,7 @@ export default function App() {
         event.preventDefault();
 
         const payload = {
-            // name: (event.currentTarget.elements.namedItem("name") as HTMLInputElement | HTMLTextAreaElement)?.value,
+            name: (event.currentTarget.elements.namedItem("name") as HTMLInputElement | HTMLTextAreaElement)?.value,
             voiceFile: voiceFile ? await toBase64(voiceFile) : null // Include voice file in the payload
         };
 
