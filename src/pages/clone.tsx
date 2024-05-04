@@ -57,7 +57,7 @@ export default function App() {
         };
 
         try {
-            const response = await fetch("https://freiza-1.taildd8a6.ts.net:6969/start-training-base64", {
+            const response = await fetch("/api/create-voice-clone", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
@@ -66,8 +66,7 @@ export default function App() {
             });
 
             if (response.ok) {
-                console.log(response)
-                // const data: CharacterResponse = await response.json();
+                const data: CharacterResponse = await response.json();
                 router.push(`/create`);
             } else {
                 console.error("Error cloning voice:", response.statusText);
