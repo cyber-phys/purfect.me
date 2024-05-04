@@ -67,11 +67,9 @@ export default function App() {
 
             if (response.ok) {
                 const data: CharacterResponse = await response.json();
-                const characterId = data.characterId;
-                console.log("Character ID:", characterId);
-                router.push(`/talk/${characterId}`);
+                router.push(`/create`);
             } else {
-                console.error("Error creating character:", response.statusText);
+                console.error("Error cloning voice:", response.statusText);
             }
         } catch (error) {
             console.error("Error creating character:", error);

@@ -45,8 +45,11 @@ export default async function handler(req: NextRequest) {
             const responseData = await response.json() as ApiResponse;
             
             if (!response.ok) {
-                return new Response(JSON.stringify({ error: responseData.error || 'Failed to start training job' }), {
-                    status: response.status || 500,
+                // return new Response(JSON.stringify({ error: responseData.error || 'Failed to start training job' }), {
+                    return new Response(JSON.stringify({ error:'Failed to start training job' }), {
+
+                    // status: response.status || 500,
+                    status: 405,
                     headers: { "Content-Type": "application/json" },
                 });
             }
@@ -65,7 +68,7 @@ export default async function handler(req: NextRequest) {
 
         // Save the character data to the database
         await db.prepare(`
-            INSERT INTO characters (
+            INSERT INTO voices (
                 id,
                 name,
                 creation_time
