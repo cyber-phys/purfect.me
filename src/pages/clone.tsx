@@ -52,12 +52,12 @@ export default function App() {
         event.preventDefault();
 
         const payload = {
-            name: (event.currentTarget.elements.namedItem("name") as HTMLInputElement | HTMLTextAreaElement)?.value,
+            // name: (event.currentTarget.elements.namedItem("name") as HTMLInputElement | HTMLTextAreaElement)?.value,
             voiceFile: voiceFile ? await toBase64(voiceFile) : null // Include voice file in the payload
         };
 
         try {
-            const response = await fetch("/api/create-voice-clone", {
+            const response = await fetch("https://freiza-1.taildd8a6.ts.net:6969/start-training-base64", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
@@ -66,7 +66,8 @@ export default function App() {
             });
 
             if (response.ok) {
-                const data: CharacterResponse = await response.json();
+                console.log(response)
+                // const data: CharacterResponse = await response.json();
                 router.push(`/create`);
             } else {
                 console.error("Error cloning voice:", response.statusText);
