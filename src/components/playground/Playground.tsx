@@ -1020,13 +1020,6 @@ export default function Playground({
     });
   }
 
-  if (outputs?.includes(PlaygroundOutputs.Chat)) {
-    mobileTabs.push({
-      title: "Chat",
-      content: chatTileContent,
-    });
-  }
-
   mobileTabs.push({
     title: "Settings",
     content: (
@@ -1041,49 +1034,56 @@ export default function Playground({
     ),
   });
 
-  mobileTabs.push({
-    title: "Canvas",
-    content: (
-      <PlaygroundTile
-        className="w-full h-full overflow-y-auto flex"
-        childrenClassName="h-full grow items-start"
-      >
-        {canvasTileContent}
-      </PlaygroundTile>
-    ),
-  });
+  if (outputs?.includes(PlaygroundOutputs.Chat)) {
+    mobileTabs.push({
+      title: "Chat",
+      content: chatTileContent,
+    });
+  }
 
-  mobileTabs.push({
-    title: "SD",
-    content: (
-      <div className="flex flex-col h-full">
-        <div
-          className="w-full h-1/2 overflow-y-auto flex"
-        >
-          {canvasTileContent}
-        </div>
+  // mobileTabs.push({
+  //   title: "Canvas",
+  //   content: (
+  //     <PlaygroundTile
+  //       className="w-full h-full overflow-y-auto flex"
+  //       childrenClassName="h-full grow items-start"
+  //     >
+  //       {canvasTileContent}
+  //     </PlaygroundTile>
+  //   ),
+  // });
+
+  // mobileTabs.push({
+  //   title: "SD",
+  //   content: (
+  //     <div className="flex flex-col h-full">
+  //       <div
+  //         className="w-full h-1/2 overflow-y-auto flex"
+  //       >
+  //         {canvasTileContent}
+  //       </div>
         
-        <div
-          className="h-1/2 grow flex"
-        >
-          {sdContent}
-        </div>
-      </div>
-    ),
-  });
+  //       <div
+  //         className="h-1/2 grow flex"
+  //       >
+  //         {sdContent}
+  //       </div>
+  //     </div>
+  //   ),
+  // });
 
-  mobileTabs.push({
-    title: "Game",
-    content: (
-      <div className="flex flex-col h-full">
-        <div className="w-full h-1/2 overflow-y-auto flex">
-          {canvasTileContent}
-        </div>
+  // mobileTabs.push({
+  //   title: "Game",
+  //   content: (
+  //     <div className="flex flex-col h-full">
+  //       <div className="w-full h-1/2 overflow-y-auto flex">
+  //         {canvasTileContent}
+  //       </div>
 
-        <div className="h-1/2 grow flex">{chatTileContent}</div>
-      </div>
-    ),
-  });
+  //       <div className="h-1/2 grow flex">{chatTileContent}</div>
+  //     </div>
+  //   ),
+  // });
 
   return (
     <>
