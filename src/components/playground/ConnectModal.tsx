@@ -13,27 +13,27 @@ interface ConnectionModalProps {
 }
 
 const ConnectionModal: React.FC<ConnectionModalProps> = ({ isOpen, onClose, onConnect, themeColor, headerHeight, agentState }) => {
-    const router = useRouter();
+  const router = useRouter();
 
-    const handleClose = () => {
-        // Check if the agentState is one of the specified states before closing
-        if (['thinking', 'speaking', 'listening'].includes(agentState)) {
-          onClose();
-        }
-    };
+  const handleClose = () => {
+    // Check if the agentState is one of the specified states before closing
+    if (['thinking', 'speaking', 'listening'].includes(agentState)) {
+      onClose();
+    }
+  };
 
-    // The onConnect function should be called without closing the modal
-    const handleConnect = () => {
-        onConnect();
-        // Do not close the modal here. It should remain open until the agentState changes.
-    };
+  // The onConnect function should be called without closing the modal
+  const handleConnect = () => {
+    onConnect();
+    // Do not close the modal here. It should remain open until the agentState changes.
+  };
 
-    const handleChangeCharacter = () => {
-        // Navigate back to the home page using Next.js router
-        router.push('/');
-    };
+  const handleChangeCharacter = () => {
+    // Navigate back to the home page using Next.js router
+    router.push('/');
+  };
 
-    return (
+  return (
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
@@ -58,15 +58,16 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ isOpen, onClose, onCo
           <p>Welcome to Purfect, the app that enables quantum link calls to other worlds! This is a voice-driven experience, so please enable microphone permissions when prompted on your device. Feel free to converse naturally - you can interrupt the voice at the other end by talking or sending a message. However, its always polite to let someone finish their thoughts. Thank you, and we hope you enjoy what were building! xoxo </p>
         </ModalBody>
         <ModalFooter>
-          {/* <Button auto flat color="error" onClick={handleClose}>
-            Cancel
-          </Button> */}
-          <Button onClick={handleChangeCharacter}>
-            Change Character
-          </Button>
-          <Button onClick={handleConnect}>
-            Connect
-          </Button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            <Button onClick={handleChangeCharacter}>
+              Change Character
+            </Button>
+            <div>
+              <Button onClick={handleConnect}>
+                Connect
+              </Button>
+            </div>
+          </div>
         </ModalFooter>
       </ModalContent>
     </Modal>
