@@ -1034,6 +1034,30 @@ export default function Playground({
     ),
   });
 
+    mobileTabs.push({
+    title: "Canvas",
+    content: (
+      <PlaygroundTile
+        className="w-full h-full overflow-y-auto flex"
+        childrenClassName="h-full grow items-start"
+      >
+        {canvasTileContent}
+      </PlaygroundTile>
+    ),
+  });
+
+    mobileTabs.push({
+    title: "Loom",
+    content: (
+      <PlaygroundTile
+        className="w-full h-full overflow-y-auto flex"
+        childrenClassName="h-full grow items-start"
+      >
+        {graphTileContent()}
+      </PlaygroundTile>
+    ),
+  });
+
   if (outputs?.includes(PlaygroundOutputs.Chat)) {
     mobileTabs.push({
       title: "Chat",
