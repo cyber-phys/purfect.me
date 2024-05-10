@@ -22,6 +22,7 @@
     "livekit-client": "^2.0.2",
     "livekit-server-sdk": "^2.0.3",
     "next": "^14.0.4",
+    "posthog-js": "^1.131.4",
     "qrcode.react": "^3.1.0",
     "react": "^18",
     "react-dom": "^18",
