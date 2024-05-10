@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@nextui-org/react';
 import { AgentState } from "@/lib/types";
-
+import { useRouter } from 'next/router';
 
 interface ConnectionModalProps {
   isOpen: boolean;
@@ -13,6 +13,8 @@ interface ConnectionModalProps {
 }
 
 const ConnectionModal: React.FC<ConnectionModalProps> = ({ isOpen, onClose, onConnect, themeColor, headerHeight, agentState }) => {
+    const router = useRouter();
+
     const handleClose = () => {
         // Check if the agentState is one of the specified states before closing
         if (['thinking', 'speaking', 'listening'].includes(agentState)) {
@@ -26,6 +28,11 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ isOpen, onClose, onCo
         // Do not close the modal here. It should remain open until the agentState changes.
     };
 
+    const handleChangeCharacter = () => {
+        // Navigate back to the home page using Next.js router
+        router.push('/');
+    };
+
     return (
     <Modal
       isOpen={isOpen}
@@ -33,6 +40,7 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ isOpen, onClose, onCo
       aria-labelledby="connection-modal"
       className={`selection:bg-${themeColor}-900`}
       style={{ height: `calc(100% - ${headerHeight}px - 100px)` }}
+      hideCloseButton={true}
       classNames={{
         body: "py-6",
         // backdrop: "bg-[#292f46]/50 backdrop-opacity-40",
@@ -53,6 +61,9 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ isOpen, onClose, onCo
           {/* <Button auto flat color="error" onClick={handleClose}>
             Cancel
           </Button> */}
+          <Button onClick={handleChangeCharacter}>
+            Change Character
+          </Button>
           <Button onClick={handleConnect}>
             Connect
           </Button>
