@@ -45,7 +45,7 @@ export const ChatMessage = ({
           className={`${
             highlightedWords <= highlight_word_count
               ? `text-${accentColor}-500`
-              : `text-${accentColor}-800`
+              : `text-${accentColor}-500`
           }`}
         >
           {word}
